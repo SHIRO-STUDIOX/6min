@@ -1,0 +1,219 @@
+@import "tailwindcss";
+@import "@heroui/styles";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ==========================================================================
+   IRANYekanX Web Font Setup
+   ========================================================================== */
+
+/* 1. Variable Font (IRANYekanXVF) */
+@font-face {
+  font-family: "IRANYekanXVF";
+  src:
+    url("/fonts/IRANYekanXVF.woff2") format("woff2-variations"),
+    url("/fonts/IRANYekanXVF.woff") format("woff-variations"),
+    url("/fonts/IRANYekanXVF.woff") format("woff");
+  font-weight: 100 1000;
+  font-display: fallback;
+}
+
+/* 2. Static Fallback Fonts (Regular & Bold) */
+@font-face {
+  font-family: "IRANYekanX";
+  src: url("/fonts/staticfonts/IRANYekanX-Regular.woff") format("woff");
+  font-weight: 400;
+  font-display: fallback;
+}
+
+@font-face {
+  font-family: "IRANYekanX";
+  src: url("/fonts/staticfonts/IRANYekanX-Bold.woff") format("woff");
+  font-weight: 700;
+  font-display: fallback;
+}
+
+/* 3. Tailwind CSS v4 Theme Configuration */
+@theme {
+  --font-sans: "IRANYekanXVF", "IRANYekanX", tahoma, sans-serif;
+  --font-mono: "IRANYekanXVF", monospace;
+}
+
+/* 4. Base Typography & Persian Formatting */
+@layer base {
+  :root,
+  body {
+    font-family: var(--font-sans);
+    letter-spacing: normal !important;
+    line-height: 1.7;
+    font-feature-settings: "ss02"; /* اعداد فارسی به صورت سراسری */
+  }
+
+  @supports (font-variation-settings: normal) {
+    :root,
+    body {
+      font-variation-settings: "dots" 2;
+    }
+  }
+
+  /* کلاس اعداد هم‌عرض برای جداول، قیمت‌ها و شمارنده‌ها */
+  .font-tabular {
+    font-feature-settings: "ss02", "ss03";
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* استثنا برای فیلدهای LTR انگلیسی و کدهای اختصاصی */
+  [dir="ltr"],
+  input[type="email"],
+  input[type="password"],
+  input[type="tel"],
+  input[type="url"],
+  .font-mono {
+    font-feature-settings: normal;
+  }
+}
+
+/* 5. IRANYekanX Variable Font Utilities */
+.vf-wght {
+  font-variation-settings: "wght" 700;
+}
+
+.vf-shar {
+  font-variation-settings: "wght" 800, "dots" 4;
+}
+
+/* ارقام فارسی دستی */
+.ss02 {
+  -moz-font-feature-settings: "ss02";
+  -webkit-font-feature-settings: "ss02";
+  font-feature-settings: "ss02";
+}
+
+/* ارقام هم‌عرض دستی */
+.ss03 {
+  -moz-font-feature-settings: "ss03";
+  -webkit-font-feature-settings: "ss03";
+  font-feature-settings: "ss03";
+}
+
+/* ==========================================================================
+   6. HeroUI Brand Color Presets
+   ========================================================================== */
+@layer base {
+  [data-brand="default"] {
+    --accent: oklch(0.58 0.22 260);
+    --accent-foreground: oklch(1 0 0);
+    --primary: oklch(0.58 0.22 260);
+    --primary-foreground: oklch(1 0 0);
+    --focus: oklch(0.58 0.22 260);
+    --link: oklch(0.58 0.22 260);
+  }
+
+  [data-brand="emerald"] {
+    --accent: oklch(0.65 0.20 155);
+    --accent-foreground: oklch(1 0 0);
+    --primary: oklch(0.65 0.20 155);
+    --primary-foreground: oklch(1 0 0);
+    --focus: oklch(0.65 0.20 155);
+    --link: oklch(0.65 0.20 155);
+  }
+
+  [data-brand="indigo"] {
+    --accent: oklch(0.58 0.23 275);
+    --accent-foreground: oklch(1 0 0);
+    --primary: oklch(0.58 0.23 275);
+    --primary-foreground: oklch(1 0 0);
+    --focus: oklch(0.58 0.23 275);
+    --link: oklch(0.58 0.23 275);
+  }
+
+  [data-brand="violet"] {
+    --accent: oklch(0.60 0.25 300);
+    --accent-foreground: oklch(1 0 0);
+    --primary: oklch(0.60 0.25 300);
+    --primary-foreground: oklch(1 0 0);
+    --focus: oklch(0.60 0.25 300);
+    --link: oklch(0.60 0.25 300);
+  }
+
+  [data-brand="amber"] {
+    --accent: oklch(0.75 0.18 65);
+    --accent-foreground: oklch(0.18 0.05 65);
+    --primary: oklch(0.75 0.18 65);
+    --primary-foreground: oklch(0.18 0.05 65);
+    --focus: oklch(0.75 0.18 65);
+    --link: oklch(0.75 0.18 65);
+  }
+
+  [data-brand="rose"] {
+    --accent: oklch(0.62 0.24 15);
+    --accent-foreground: oklch(1 0 0);
+    --primary: oklch(0.62 0.24 15);
+    --primary-foreground: oklch(1 0 0);
+    --focus: oklch(0.62 0.24 15);
+    --link: oklch(0.62 0.24 15);
+  }
+
+  [data-brand="cyan"] {
+    --accent: oklch(0.70 0.16 210);
+    --accent-foreground: oklch(0.15 0.05 210);
+    --primary: oklch(0.70 0.16 210);
+    --primary-foreground: oklch(0.15 0.05 210);
+    --focus: oklch(0.70 0.16 210);
+    --link: oklch(0.70 0.16 210);
+  }
+}
+
+/* ==========================================================================
+   7. Specular Glass Border Light Utility (افکت حاشیه نوری گرادیانتی شیشه‌ای)
+   نور بازتابی درخشان از بالا با کاهش تدریجی اوپسیتی در لبه‌های پایینی
+   ========================================================================== */
+@layer utilities {
+  .glass-rim {
+    position: relative;
+  }
+
+  .glass-rim::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.9) 0%,
+      rgba(255, 255, 255, 0.3) 35%,
+      rgba(255, 255, 255, 0.05) 80%,
+      transparent 100%
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .dark .glass-rim::before {
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.22) 0%,
+      rgba(255, 255, 255, 0.08) 40%,
+      rgba(255, 255, 255, 0.02) 80%,
+      transparent 100%
+    );
+  }
+
+  /* ==========================================================================
+     8. Apple iOS Continuous Corner Smoothing (Squircle Method)
+     ========================================================================== */
+  .rounded-ios-player,
+  .ios-radius-player {
+    border-radius: 32px;
+    -webkit-corner-smoothing: 0.6;
+    corner-smoothing: 60%;
+    transform: translateZ(0);
+    isolation: isolate;
+    overflow: hidden;
+  }
+}
+

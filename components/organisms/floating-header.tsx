@@ -1,0 +1,272 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import { useTheme } from "next-themes";
+import {
+  Button,
+  Chip,
+  Avatar,
+} from "@heroui/react";
+import {
+  User,
+  Menu,
+  X,
+  ChevronDown,
+  BookOpen,
+  Compass,
+  CreditCard,
+  Settings,
+  LogOut,
+  ShieldCheck,
+  Award,
+  Layers,
+  CheckCircle2,
+  Sun,
+  Moon,
+} from "lucide-react";
+
+export interface FloatingHeaderProps {
+  brandTitle?: string;
+  isLoggedIn?: boolean;
+  userName?: string;
+  userRole?: string;
+  avatarUrl?: string;
+  activeNavItem?: string;
+  isCompact?: boolean;
+}
+
+const navItems = [
+  { id: "home", label: "خانه", href: "#", icon: Compass },
+  { id: "courses", label: "سرفصل‌های دوره", href: "#", icon: BookOpen },
+  { id: "roadmap", label: "نقشه یادگیری", href: "#", icon: Layers },
+  { id: "pricing", label: "اشتراک PRO", href: "#", icon: CreditCard },
+];
+
+export function FloatingHeader({
+  brandTitle = "۶دقیقه",
+  isLoggedIn = true,
+  userName = "علی رضوانی",
+  userRole = "دانشجوی سطح پیشرفته",
+  avatarUrl = "https://i.pravatar.cc/150?u=a042581f4e29026024d",
+  activeNavItem = "home",
+  isCompact = false,
+}: FloatingHeaderProps) {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const { setTheme, resolvedTheme } = useTheme();
+
+  useEffect(() => {
+    setIsMounted(true);
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const isLight = resolvedTheme === "light";
+  const isHeaderCompact = isCompact || scrolled;
+
+  return (
+    <div className="@container w-full flex flex-col items-center px-2.5 @[640px]:px-6 pt-3 @[640px]:pt-6 z-40 select-none">
+      {/* ۱. بدنه اصلی هدر شناور با ارتفاع ۴۲ پیکسل در موبایل و کوئری کانتینر (Container Query) */}
+      <header
+        className={`w-full h-[42px] @[640px]:h-auto ${
+          isHeaderCompact ? "max-w-4xl p-1 @[640px]:p-2" : "max-w-6xl p-1 @[640px]:p-2.5 @[768px]:p-3"
+        } rounded-full glass-rim bg-background/45 dark:bg-default-900/30 backdrop-blur-3xl backdrop-saturate-150 border border-white/10 dark:border-white/5 shadow-[0_8px_32px_0_rgba(0,0,0,0.06)] hover:shadow-[0_16px_48px_0_rgba(0,0,0,0.12)] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] dark:hover:shadow-[0_16px_48px_0_rgba(0,0,0,0.5)] flex items-center justify-between transition-all duration-500 [transition-timing-function:cubic-bezier(0.23,1,0.32,1)] active:scale-[0.985] active:duration-180 cursor-default`}
+      >
+        {/* بخش راست (RTL Start): لوگو و برند کپسولی */}
+        <div className="flex items-center gap-1.5 @[640px]:gap-2.5 @[768px]:gap-5">
+          <Link
+            href="/"
+            className="flex items-center gap-1.5 @[640px]:gap-2.5 rounded-full group transition-transform active:scale-95"
+          >
+            <div className="size-[34px] @[640px]:size-10 rounded-full bg-gradient-to-tr from-accent to-accent/70 text-accent-foreground flex items-center justify-center shadow-lg shadow-accent/30 group-hover:shadow-accent/50 group-hover:scale-105 transition-all">
+              <span className="font-black text-sm @[640px]:text-lg select-none leading-none pt-0.5 font-tabular">۶</span>
+            </div>
+            <div className="flex items-center gap-1 @[640px]:gap-1.5">
+              <span className="font-black text-xs @[640px]:text-base tracking-tight text-foreground">
+                {brandTitle}
+              </span>
+              <Chip
+                size="sm"
+                variant="primary"
+                color="accent"
+                className="h-3.5 text-[8px] px-1 @[640px]:h-4 @[640px]:text-[9px] @[640px]:px-1.5 font-bold rounded-full"
+              >
+                PRO
+              </Chip>
+            </div>
+          </Link>
+
+          <div className="h-4 @[640px]:h-5 w-px bg-default-200/40 dark:bg-white/10 hidden @[1024px]:block" />
+
+          {/* منوی ناوبری دسکتاپ به صورت متن مینیمال */}
+          <nav className="hidden @[768px]:flex items-center gap-1">
+            {navItems.map((item) => {
+              const isActive = activeNavItem === item.id;
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.id}
+                  href={item.href}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs transition-colors ${
+                    isActive
+                      ? "text-foreground dark:text-white font-black"
+                      : "text-muted hover:text-foreground font-medium hover:bg-default-100/30"
+                  }`}
+                >
+                  <Icon className={`size-3.5 ${isActive ? "text-foreground dark:text-white stroke-[2.5]" : "text-muted"}`} />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* بخش چپ (RTL End): تم، آواتار و منوی واکنش‌گرا */}
+        <div className="flex items-center gap-1 @[640px]:gap-2">
+          {/* سوییچر تم کپسولی */}
+          <Button
+            variant="outline"
+            size="sm"
+            isIconOnly
+            className="size-[34px] min-w-[34px] @[640px]:size-10 @[640px]:min-w-10 rounded-full border-default-200/50 dark:border-white/10"
+            aria-label="تغییر تم"
+            onClick={() => setTheme(isLight ? "dark" : "light")}
+          >
+            {isMounted && isLight ? <Sun className="size-3.5 @[640px]:size-4" /> : <Moon className="size-3.5 @[640px]:size-4" />}
+          </Button>
+
+          {/* بخش پروفایل کاربری یا دکمه ورود */}
+          {isLoggedIn ? (
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setIsProfileOpen(!isProfileOpen)}
+                className="flex items-center gap-1 p-0.5 pe-1.5 @[640px]:p-1 @[640px]:pe-2 rounded-full hover:bg-default-100/50 transition-all cursor-pointer"
+                title="حساب کاربری"
+              >
+                <Avatar size="sm" className="size-7 @[640px]:size-8 ring-2 ring-accent/30 rounded-full shadow-sm">
+                  <Avatar.Image src={avatarUrl} alt={userName} />
+                  <Avatar.Fallback className="bg-accent/20 text-accent font-bold text-[10px] @[640px]:text-xs rounded-full">
+                    {userName.slice(0, 2)}
+                  </Avatar.Fallback>
+                </Avatar>
+                <ChevronDown className="size-3 @[640px]:size-3.5 text-muted hidden @[640px]:block" />
+              </button>
+
+              {/* منوی دراپ‌داون پروفایل با استایل شیشه‌ای */}
+              {isProfileOpen && (
+                <div className="absolute left-0 mt-2.5 w-60 p-2.5 rounded-3xl bg-background/80 dark:bg-default-900/80 backdrop-blur-3xl backdrop-saturate-150 border border-white/20 dark:border-white/5 shadow-2xl z-50 flex flex-col gap-1.5 animate-in fade-in zoom-in-95 duration-150 text-right">
+                  <div className="p-3 rounded-2xl bg-default-100/50 border border-default-200/30 flex flex-col gap-1">
+                    <span className="text-xs font-black text-foreground truncate">
+                      {userName}
+                    </span>
+                    <span className="text-[10px] text-accent font-bold flex items-center gap-1">
+                      <ShieldCheck className="size-3" />
+                      {userRole}
+                    </span>
+                  </div>
+
+                  <div className="h-px bg-default-200/40 dark:bg-white/10 my-0.5" />
+
+                  <button
+                    type="button"
+                    onClick={() => setIsProfileOpen(false)}
+                    className="flex items-center gap-2.5 w-full px-3 py-2 rounded-xl text-xs font-medium text-foreground hover:bg-default-100/50 transition-colors text-right cursor-pointer"
+                  >
+                    <User className="size-3.5 text-accent" />
+                    <span>داشبورد یادگیری من</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setIsProfileOpen(false)}
+                    className="flex items-center gap-2.5 w-full px-3 py-2 rounded-xl text-xs font-medium text-foreground hover:bg-default-100/50 transition-colors text-right cursor-pointer"
+                  >
+                    <Award className="size-3.5 text-amber-500" />
+                    <span>گواهینامه‌ها و دستاوردها</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setIsProfileOpen(false)}
+                    className="flex items-center gap-2.5 w-full px-3 py-2 rounded-xl text-xs font-medium text-foreground hover:bg-default-100/50 transition-colors text-right cursor-pointer"
+                  >
+                    <Settings className="size-3.5 text-muted" />
+                    <span>تنظیمات حساب</span>
+                  </button>
+
+                  <div className="h-px bg-default-200/40 dark:bg-white/10 my-0.5" />
+
+                  <button
+                    type="button"
+                    onClick={() => setIsProfileOpen(false)}
+                    className="flex items-center gap-2.5 w-full px-3 py-2 rounded-xl text-xs font-bold text-danger hover:bg-danger/10 transition-colors text-right cursor-pointer"
+                  >
+                    <LogOut className="size-3.5" />
+                    <span>خروج از حساب</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Button
+              variant="primary"
+              size="sm"
+              className="h-[34px] px-3.5 @[640px]:h-10 @[640px]:px-5 rounded-full font-bold text-[11px] @[640px]:text-xs shadow-md shadow-accent/20 flex items-center justify-center"
+            >
+              <span>ورود / ثبت‌نام</span>
+            </Button>
+          )}
+
+          {/* دکمه منوی موبایل کپسولی با HeroUI Button */}
+          <Button
+            variant="outline"
+            size="sm"
+            isIconOnly
+            className="@[768px]:hidden size-[34px] min-w-[34px] @[640px]:size-10 @[640px]:min-w-10 rounded-full border-default-200/50 dark:border-white/10"
+            aria-label="منوی اصلی"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? <X className="size-3.5 @[640px]:size-4" /> : <Menu className="size-3.5 @[640px]:size-4" />}
+          </Button>
+        </div>
+      </header>
+
+      {/* ۲. دراور بازشونده منوی موبایل با افکت گلس و بوردر ملایم */}
+      {isMobileMenuOpen && (
+        <div className="@[768px]:hidden w-full max-w-6xl mt-2.5 p-4 rounded-3xl bg-background/75 dark:bg-default-900/75 backdrop-blur-3xl backdrop-saturate-150 border border-white/20 dark:border-white/5 shadow-2xl flex flex-col gap-2 animate-in fade-in slide-in-from-top-2 duration-200">
+          <nav className="flex flex-col gap-1.5">
+            {navItems.map((item) => {
+              const isActive = activeNavItem === item.id;
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.id}
+                  href={item.href}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`flex items-center justify-between p-3 rounded-2xl text-xs transition-colors ${
+                    isActive
+                      ? "text-foreground dark:text-white font-black bg-default-100/40"
+                      : "text-muted hover:text-foreground font-medium hover:bg-default-100/50"
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <Icon className={`size-4 ${isActive ? "text-foreground dark:text-white stroke-[2.5]" : "text-muted"}`} />
+                    <span>{item.label}</span>
+                  </div>
+                  {isActive && <CheckCircle2 className="size-3.5 text-accent" />}
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+      )}
+    </div>
+  );
+}
