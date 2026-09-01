@@ -3,11 +3,135 @@ import { SandboxComponent } from "./sandbox-types";
 import { FloatingHeader } from "@/components/organisms/floating-header";
 import { PhoneLogin } from "@/components/organisms/phone-login";
 import { VideoPlayer } from "@/components/organisms/video-player";
+import { VideoCard } from "@/components/organisms/video-card";
 
 export const sandboxRegistry: SandboxComponent[] = [
   // ==========================================
   // ORGANISMS
   // ==========================================
+  {
+    id: "video-card",
+    name: "VideoCard",
+    persianName: "کارت ویدیویی درس ۱ (Video Card)",
+    category: "organisms",
+    description: "کارت اول سیستم آموزشی ۶دقیقه با فرمت مربعی در دسکتاپ، پیش‌نمایش و پخش ویدیو ۱۶:۹، محاسبه درصد تماشا، استیت تکمیل و ناوبری رو به جلو در سمت راست.",
+    filePath: "components/organisms/video-card.tsx",
+    dependencies: [
+      "@heroui/react Card",
+      "@heroui/react Button",
+      "@heroui/react ProgressBar",
+      "@solar-icons/react",
+    ],
+    defaultViewport: "desktop",
+    defaultProps: {
+      cardLabel: "کارت ۱: ویدیوی آموزشی",
+      title: "کلاس درس",
+      description: "بریم توی این ویدیو الفبا رو یادبگیریم",
+      poster: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80",
+      duration: 180,
+      initialProgress: 0,
+      isCompleted: false,
+      isLocked: false,
+      lockMessage: "برای شروع این جلسه باید پیش‌نیازهای قبلی را کامل کنید.",
+    },
+    propDefinitions: [
+      {
+        name: "cardLabel",
+        label: "برچسب کارت",
+        type: "string",
+        defaultValue: "کارت ۱: ویدیوی آموزشی",
+        category: "content",
+      },
+      {
+        name: "title",
+        label: "عنوان جلسه / ویدیو",
+        type: "string",
+        defaultValue: "کلاس درس",
+        category: "content",
+      },
+      {
+        name: "description",
+        label: "توضیحات کوتاه",
+        type: "string",
+        defaultValue: "بریم توی این ویدیو الفبا رو یادبگیریم",
+        category: "content",
+      },
+      {
+        name: "poster",
+        label: "تصویر کاور / پیش‌نمایش",
+        type: "select",
+        options: [
+          { label: "فلوئید گلس رنگارنگ (بنفش و نارنجی)", value: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80" },
+          { label: "منشور نوری بلورین (سیان و نئون)", value: "https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=1200&q=80" },
+          { label: "امواج گرادیانت تیره مینیمال", value: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=1200&q=80" },
+        ],
+        defaultValue: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80",
+        category: "content",
+      },
+      {
+        name: "duration",
+        label: "مدت زمان کل (ثانیه)",
+        type: "number",
+        defaultValue: 180,
+        category: "content",
+      },
+      {
+        name: "initialProgress",
+        label: "درصد پیش‌فرض مشاهده",
+        type: "number",
+        min: 0,
+        max: 100,
+        step: 5,
+        defaultValue: 0,
+        category: "state",
+      },
+      {
+        name: "isCompleted",
+        label: "وضعیت تکمیل شده (Completed)",
+        type: "boolean",
+        defaultValue: false,
+        category: "state",
+        description: "آزادسازی دکمه کارت بعدی و نمایش نشانگر موفقیت",
+      },
+      {
+        name: "isLocked",
+        label: "وضعیت قفل بودن (Locked)",
+        type: "boolean",
+        defaultValue: false,
+        category: "state",
+      },
+    ],
+    presets: [
+      {
+        name: "default",
+        label: "حالت پیش‌نمایش اولیه",
+        props: { initialProgress: 0, isCompleted: false, isLocked: false },
+      },
+      {
+        name: "in-progress",
+        label: "در حال مشاهده (۴۵٪ پیشرفت)",
+        props: { initialProgress: 45, isCompleted: false, isLocked: false },
+      },
+      {
+        name: "completed",
+        label: "جلسه تکمیل شده (۱۰۰٪)",
+        props: { initialProgress: 100, isCompleted: true, isLocked: false },
+      },
+      {
+        name: "locked",
+        label: "جلسه قفل شده",
+        props: { isLocked: true },
+      },
+    ],
+    render: (props) => (
+      <div className="w-full flex items-center justify-center p-2 sm:p-6">
+        <VideoCard {...props} />
+      </div>
+    ),
+    getCodeSnippet: (props) =>
+      `import { VideoCard } from "@/components/organisms/video-card";\n\n<VideoCard\n  cardLabel="${props.cardLabel || "کارت ۱: ویدیوی آموزشی"}"\n  title="${props.title || "معماری یادگیری عمیق در ۶ دقیقه"}"\n  description="${props.description || "مدل‌های ذهنی تک‌موضوعی و حفظ تمرکز شناختی بدون خستگی"}"\n  poster="${props.poster || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80"}"\n  duration={${props.duration || 180}}\n  initialProgress={${props.initialProgress ?? 0}}\n  isCompleted={${props.isCompleted ?? false}}\n  isLocked={${props.isLocked ?? false}}\n  onNext={() => console.log("Next Card")}\n/>`,
+    tags: ["Organism", "Card", "Video", "Lesson", "HeroUI", "Interactive", "Square"],
+  },
   {
     id: "video-player",
     name: "VideoPlayer",
