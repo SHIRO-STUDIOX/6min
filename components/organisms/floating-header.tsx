@@ -7,6 +7,10 @@ import {
   Button,
   Chip,
   Avatar,
+  Dropdown,
+  Label,
+  Description,
+  Separator,
 } from "@heroui/react";
 import {
   User,
@@ -53,7 +57,6 @@ export function FloatingHeader({
   isCompact = false,
 }: FloatingHeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { setTheme, resolvedTheme } = useTheme();
@@ -76,7 +79,7 @@ export function FloatingHeader({
       <header
         className={`w-full h-[42px] @[640px]:h-auto ${
           isHeaderCompact ? "max-w-4xl p-1 @[640px]:p-2" : "max-w-6xl p-1 @[640px]:p-2.5 @[768px]:p-3"
-        } rounded-full glass-rim bg-background/45 dark:bg-default-900/30 backdrop-blur-3xl backdrop-saturate-150 border border-white/10 dark:border-white/5 shadow-[0_8px_32px_0_rgba(0,0,0,0.06)] hover:shadow-[0_16px_48px_0_rgba(0,0,0,0.12)] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] dark:hover:shadow-[0_16px_48px_0_rgba(0,0,0,0.5)] flex items-center justify-between transition-all duration-500 [transition-timing-function:cubic-bezier(0.23,1,0.32,1)] active:scale-[0.985] active:duration-180 cursor-default`}
+        } rounded-full glass-rim bg-surface/80 backdrop-blur-3xl backdrop-saturate-150 border border-separator/50 shadow-[0_8px_32px_0_rgba(0,0,0,0.06)] hover:shadow-[0_16px_48px_0_rgba(0,0,0,0.12)] flex items-center justify-between transition-all duration-500 [transition-timing-function:cubic-bezier(0.23,1,0.32,1)] active:scale-[0.985] active:duration-180 cursor-default`}
       >
         {/* بخش راست (RTL Start): لوگو و برند کپسولی */}
         <div className="flex items-center gap-1.5 @[640px]:gap-2.5 @[768px]:gap-5">
@@ -102,7 +105,7 @@ export function FloatingHeader({
             </div>
           </Link>
 
-          <div className="h-4 @[640px]:h-5 w-px bg-default-200/40 dark:bg-white/10 hidden @[1024px]:block" />
+          <Separator orientation="vertical" className="h-5 hidden @[1024px]:block" />
 
           {/* منوی ناوبری دسکتاپ به صورت متن مینیمال */}
           <nav className="hidden @[768px]:flex items-center gap-1">
@@ -115,11 +118,11 @@ export function FloatingHeader({
                   href={item.href}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs transition-colors ${
                     isActive
-                      ? "text-foreground dark:text-white font-black"
-                      : "text-muted hover:text-foreground font-medium hover:bg-default-100/30"
+                      ? "text-foreground font-black bg-surface-secondary"
+                      : "text-muted hover:text-foreground font-medium hover:bg-surface-secondary/50"
                   }`}
                 >
-                  <Icon className={`size-3.5 ${isActive ? "text-foreground dark:text-white stroke-[2.5]" : "text-muted"}`} />
+                  <Icon className={`size-3.5 ${isActive ? "text-foreground stroke-[2.5]" : "text-muted"}`} />
                   <span>{item.label}</span>
                 </Link>
               );
@@ -134,21 +137,21 @@ export function FloatingHeader({
             variant="outline"
             size="sm"
             isIconOnly
-            className="size-[34px] min-w-[34px] @[640px]:size-10 @[640px]:min-w-10 rounded-full border-default-200/50 dark:border-white/10"
+            className="size-[34px] min-w-[34px] @[640px]:size-10 @[640px]:min-w-10 rounded-full border-separator"
             aria-label="تغییر تم"
             onClick={() => setTheme(isLight ? "dark" : "light")}
           >
             {isMounted && isLight ? <Sun className="size-3.5 @[640px]:size-4" /> : <Moon className="size-3.5 @[640px]:size-4" />}
           </Button>
 
-          {/* بخش پروفایل کاربری یا دکمه ورود */}
+          {/* بخش پروفایل کاربری با HeroUI Dropdown رسمی */}
           {isLoggedIn ? (
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => setIsProfileOpen(!isProfileOpen)}
-                className="flex items-center gap-1 p-0.5 pe-1.5 @[640px]:p-1 @[640px]:pe-2 rounded-full hover:bg-default-100/50 transition-all cursor-pointer"
-                title="حساب کاربری"
+            <Dropdown>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="flex items-center gap-1 p-0.5 pe-1.5 @[640px]:p-1 @[640px]:pe-2 rounded-full hover:bg-surface-secondary/60 transition-all cursor-pointer h-auto min-w-0"
+                aria-label="حساب کاربری"
               >
                 <Avatar size="sm" className="size-7 @[640px]:size-8 ring-2 ring-accent/30 rounded-full shadow-sm">
                   <Avatar.Image src={avatarUrl} alt={userName} />
@@ -157,63 +160,44 @@ export function FloatingHeader({
                   </Avatar.Fallback>
                 </Avatar>
                 <ChevronDown className="size-3 @[640px]:size-3.5 text-muted hidden @[640px]:block" />
-              </button>
+              </Button>
 
-              {/* منوی دراپ‌داون پروفایل با استایل شیشه‌ای */}
-              {isProfileOpen && (
-                <div className="absolute left-0 mt-2.5 w-60 p-2.5 rounded-3xl bg-background/80 dark:bg-default-900/80 backdrop-blur-3xl backdrop-saturate-150 border border-white/20 dark:border-white/5 shadow-2xl z-50 flex flex-col gap-1.5 animate-in fade-in zoom-in-95 duration-150 text-right">
-                  <div className="p-3 rounded-2xl bg-default-100/50 border border-default-200/30 flex flex-col gap-1">
-                    <span className="text-xs font-black text-foreground truncate">
-                      {userName}
-                    </span>
-                    <span className="text-[10px] text-accent font-bold flex items-center gap-1">
-                      <ShieldCheck className="size-3" />
-                      {userRole}
-                    </span>
-                  </div>
+              <Dropdown.Popover placement="bottom end" className="rounded-3xl bg-overlay/95 backdrop-blur-2xl border border-separator/50 shadow-2xl p-2 w-60">
+                <Dropdown.Menu aria-label="منوی کاربری" className="text-right">
+                  <Dropdown.Section>
+                    <Dropdown.Item id="user-info" textValue={userName} className="p-3 rounded-2xl bg-surface-secondary/70 border border-separator/40 flex flex-col gap-1 cursor-default pointer-events-none mb-1">
+                      <Label className="text-xs font-black text-foreground truncate">
+                        {userName}
+                      </Label>
+                      <Description className="text-[10px] text-accent font-bold flex items-center gap-1">
+                        <ShieldCheck className="size-3" />
+                        {userRole}
+                      </Description>
+                    </Dropdown.Item>
+                  </Dropdown.Section>
 
-                  <div className="h-px bg-default-200/40 dark:bg-white/10 my-0.5" />
-
-                  <button
-                    type="button"
-                    onClick={() => setIsProfileOpen(false)}
-                    className="flex items-center gap-2.5 w-full px-3 py-2 rounded-xl text-xs font-medium text-foreground hover:bg-default-100/50 transition-colors text-right cursor-pointer"
-                  >
+                  <Dropdown.Item id="dashboard" textValue="داشبورد یادگیری من" className="rounded-xl py-2 px-2.5 text-xs font-medium">
                     <User className="size-3.5 text-accent" />
-                    <span>داشبورد یادگیری من</span>
-                  </button>
+                    <Label>داشبورد یادگیری من</Label>
+                  </Dropdown.Item>
 
-                  <button
-                    type="button"
-                    onClick={() => setIsProfileOpen(false)}
-                    className="flex items-center gap-2.5 w-full px-3 py-2 rounded-xl text-xs font-medium text-foreground hover:bg-default-100/50 transition-colors text-right cursor-pointer"
-                  >
-                    <Award className="size-3.5 text-amber-500" />
-                    <span>گواهینامه‌ها و دستاوردها</span>
-                  </button>
+                  <Dropdown.Item id="awards" textValue="گواهینامه‌ها و دستاوردها" className="rounded-xl py-2 px-2.5 text-xs font-medium">
+                    <Award className="size-3.5 text-warning" />
+                    <Label>گواهینامه‌ها و دستاوردها</Label>
+                  </Dropdown.Item>
 
-                  <button
-                    type="button"
-                    onClick={() => setIsProfileOpen(false)}
-                    className="flex items-center gap-2.5 w-full px-3 py-2 rounded-xl text-xs font-medium text-foreground hover:bg-default-100/50 transition-colors text-right cursor-pointer"
-                  >
+                  <Dropdown.Item id="settings" textValue="تنظیمات حساب" className="rounded-xl py-2 px-2.5 text-xs font-medium">
                     <Settings className="size-3.5 text-muted" />
-                    <span>تنظیمات حساب</span>
-                  </button>
+                    <Label>تنظیمات حساب</Label>
+                  </Dropdown.Item>
 
-                  <div className="h-px bg-default-200/40 dark:bg-white/10 my-0.5" />
-
-                  <button
-                    type="button"
-                    onClick={() => setIsProfileOpen(false)}
-                    className="flex items-center gap-2.5 w-full px-3 py-2 rounded-xl text-xs font-bold text-danger hover:bg-danger/10 transition-colors text-right cursor-pointer"
-                  >
+                  <Dropdown.Item id="logout" textValue="خروج از حساب" variant="danger" className="rounded-xl py-2 px-2.5 text-xs font-bold text-danger">
                     <LogOut className="size-3.5" />
-                    <span>خروج از حساب</span>
-                  </button>
-                </div>
-              )}
-            </div>
+                    <Label>خروج از حساب</Label>
+                  </Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown.Popover>
+            </Dropdown>
           ) : (
             <Button
               variant="primary"
@@ -229,7 +213,7 @@ export function FloatingHeader({
             variant="outline"
             size="sm"
             isIconOnly
-            className="@[768px]:hidden size-[34px] min-w-[34px] @[640px]:size-10 @[640px]:min-w-10 rounded-full border-default-200/50 dark:border-white/10"
+            className="@[768px]:hidden size-[34px] min-w-[34px] @[640px]:size-10 @[640px]:min-w-10 rounded-full border-separator"
             aria-label="منوی اصلی"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
@@ -238,9 +222,9 @@ export function FloatingHeader({
         </div>
       </header>
 
-      {/* ۲. دراور بازشونده منوی موبایل با افکت گلس و بوردر ملایم */}
+      {/* ۲. منوی کشویی موبایل */}
       {isMobileMenuOpen && (
-        <div className="@[768px]:hidden w-full max-w-6xl mt-2.5 p-4 rounded-3xl bg-background/75 dark:bg-default-900/75 backdrop-blur-3xl backdrop-saturate-150 border border-white/20 dark:border-white/5 shadow-2xl flex flex-col gap-2 animate-in fade-in slide-in-from-top-2 duration-200">
+        <div className="@[768px]:hidden w-full max-w-6xl mt-2.5 p-4 rounded-3xl bg-overlay/95 backdrop-blur-3xl backdrop-saturate-150 border border-separator/60 shadow-2xl flex flex-col gap-2 animate-in fade-in slide-in-from-top-2 duration-200">
           <nav className="flex flex-col gap-1.5">
             {navItems.map((item) => {
               const isActive = activeNavItem === item.id;
@@ -252,12 +236,12 @@ export function FloatingHeader({
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={`flex items-center justify-between p-3 rounded-2xl text-xs transition-colors ${
                     isActive
-                      ? "text-foreground dark:text-white font-black bg-default-100/40"
-                      : "text-muted hover:text-foreground font-medium hover:bg-default-100/50"
+                      ? "text-foreground font-black bg-surface-secondary"
+                      : "text-muted hover:text-foreground font-medium hover:bg-surface-secondary/50"
                   }`}
                 >
                   <div className="flex items-center gap-2">
-                    <Icon className={`size-4 ${isActive ? "text-foreground dark:text-white stroke-[2.5]" : "text-muted"}`} />
+                    <Icon className={`size-4 ${isActive ? "text-foreground stroke-[2.5]" : "text-muted"}`} />
                     <span>{item.label}</span>
                   </div>
                   {isActive && <CheckCircle2 className="size-3.5 text-accent" />}

@@ -4,6 +4,11 @@ import { FloatingHeader } from "@/components/organisms/floating-header";
 import { PhoneLogin } from "@/components/organisms/phone-login";
 import { VideoPlayer } from "@/components/organisms/video-player";
 import { VideoCard } from "@/components/organisms/video-card";
+import { VocabularyCard } from "@/components/organisms/vocabulary-card";
+import { GrammarCard } from "@/components/organisms/grammar-card";
+import { DictationCard } from "@/components/organisms/dictation-card";
+import { PronunciationCard } from "@/components/organisms/pronunciation-card";
+import { CompletionCard } from "@/components/organisms/completion-card";
 
 export const sandboxRegistry: SandboxComponent[] = [
   // ==========================================
@@ -131,6 +136,551 @@ export const sandboxRegistry: SandboxComponent[] = [
     getCodeSnippet: (props) =>
       `import { VideoCard } from "@/components/organisms/video-card";\n\n<VideoCard\n  cardLabel="${props.cardLabel || "کارت ۱: ویدیوی آموزشی"}"\n  title="${props.title || "معماری یادگیری عمیق در ۶ دقیقه"}"\n  description="${props.description || "مدل‌های ذهنی تک‌موضوعی و حفظ تمرکز شناختی بدون خستگی"}"\n  poster="${props.poster || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80"}"\n  duration={${props.duration || 180}}\n  initialProgress={${props.initialProgress ?? 0}}\n  isCompleted={${props.isCompleted ?? false}}\n  isLocked={${props.isLocked ?? false}}\n  onNext={() => console.log("Next Card")}\n/>`,
     tags: ["Organism", "Card", "Video", "Lesson", "HeroUI", "Interactive", "Square"],
+  },
+  {
+    id: "vocabulary-card",
+    name: "VocabularyCard",
+    persianName: "کارت واژگان و تطبیق اصطلاحات (Vocabulary Card)",
+    category: "organisms",
+    description: "کارت دوم آموزش میکرولرنینگ با معماری ماشین وضعیت متناهی (FSM)، تطبیق دو ستونه واژگان تخصصی، پخش صوتی، اعتبارسنجی خطا و موفقیت، محاسبه پیشرفت و ارسال گزارش عملکرد.",
+    filePath: "components/organisms/vocabulary-card.tsx",
+    dependencies: [
+      "@heroui/react Card",
+      "@heroui/react Button",
+      "@heroui/react ProgressBar",
+      "@heroui/react Chip",
+      "@solar-icons/react",
+      "lucide-react",
+    ],
+    defaultViewport: "desktop",
+    defaultProps: {
+      cardLabel: "کارت ۲: تطبیق واژگان",
+      title: "واژه‌نامه تخصصی درس",
+      description: "کلمات انگلیسی را به معادل فارسی صحیح متصل کنید",
+      autoShuffleTarget: true,
+      isLocked: false,
+      lockMessage: "برای شروع این بخش باید پیش‌نیازهای قبلی را کامل کنید.",
+    },
+    propDefinitions: [
+      {
+        name: "cardLabel",
+        label: "برچسب کارت",
+        type: "string",
+        defaultValue: "کارت ۲: تطبیق واژگان",
+        category: "content",
+      },
+      {
+        name: "title",
+        label: "عنوان تمرین",
+        type: "string",
+        defaultValue: "واژه‌نامه تخصصی درس",
+        category: "content",
+      },
+      {
+        name: "description",
+        label: "توضیحات راهنما",
+        type: "string",
+        defaultValue: "کلمات انگلیسی را به معادل فارسی صحیح متصل کنید",
+        category: "content",
+      },
+      {
+        name: "autoShuffleTarget",
+        label: "شافل خودکار گزینه‌ها",
+        type: "boolean",
+        defaultValue: true,
+        category: "behavior",
+        description: "به‌هم‌ریختن تصادفی ستون معانی برای جلوگیری از قرارگیری متناظر",
+      },
+      {
+        name: "isLocked",
+        label: "وضعیت قفل بودن (Locked)",
+        type: "boolean",
+        defaultValue: false,
+        category: "state",
+        description: "قفل کردن تعامل تا تکمیل کارت قبلی",
+      },
+    ],
+    presets: [
+      {
+        name: "default",
+        label: "حالت اولیه آماده پاسخ‌دهی",
+        props: { isLocked: false, autoShuffleTarget: true },
+      },
+      {
+        name: "locked",
+        label: "جلسه قفل شده",
+        props: { isLocked: true, lockMessage: "ابتدا ویدیوی آموزشی درس را تا انتها مشاهده کنید." },
+      },
+    ],
+    render: (props) => (
+      <div className="w-full flex items-center justify-center p-2 sm:p-6">
+        <VocabularyCard
+          {...props}
+          onComplete={(res) => console.log("Vocabulary Card Completed:", res)}
+          onNext={() => console.log("Navigate to Next Card")}
+        />
+      </div>
+    ),
+    getCodeSnippet: (props) =>
+      `import { VocabularyCard } from "@/components/organisms/vocabulary-card";\n\n<VocabularyCard\n  cardLabel="${props.cardLabel || "کارت ۲: تطبیق واژگان"}"\n  title="${props.title || "واژه‌نامه تخصصی درس"}"\n  description="${props.description || "کلمات انگلیسی را به معادل فارسی صحیح متصل کنید"}"\n  autoShuffleTarget={${props.autoShuffleTarget ?? true}}\n  isLocked={${props.isLocked ?? false}}\n  onComplete={(result) => console.log("Completed:", result)}\n  onNext={() => console.log("Next Card")}\n/>`,
+    tags: ["Organism", "Card", "Vocabulary", "Matching", "FSM", "HeroUI", "Interactive", "Square"],
+  },
+  {
+    id: "grammar-card",
+    name: "GrammarCard",
+    persianName: "کارت گرامر و پازل کلمات (Grammar Card)",
+    category: "organisms",
+    description: "کارت سوم آموزش میکرولرنینگ با ماشین وضعیت متناهی (FSM)، پازل چینش کلمات انگلیسی، اعتبارسنجی خطا و موفقیت، پخش صوتی تلفظ، شمارش خطاها، اسلات‌های حفظ چیدمان و گزارش عملکرد.",
+    filePath: "components/organisms/grammar-card.tsx",
+    dependencies: [
+      "@heroui/react Card",
+      "@heroui/react Button",
+      "@heroui/react ProgressBar",
+      "@heroui/react Chip",
+      "@heroui/react Spinner",
+      "@solar-icons/react",
+      "lucide-react",
+    ],
+    defaultViewport: "desktop",
+    defaultProps: {
+      cardLabel: "کارت ۳: ساختار جمله و گرامر",
+      title: "پازل کلمات و گرامر",
+      description: "کلمات انگلیسی را برای ساخت جمله صحیح به ترتیب لمس کنید",
+      autoShuffleBank: true,
+      autoPlayAudioOnSuccess: true,
+      isLocked: false,
+      lockMessage: "برای شروع این بخش باید پیش‌نیازهای قبلی را کامل کنید.",
+    },
+    propDefinitions: [
+      {
+        name: "cardLabel",
+        label: "برچسب کارت",
+        type: "string",
+        defaultValue: "کارت ۳: ساختار جمله و گرامر",
+        category: "content",
+      },
+      {
+        name: "title",
+        label: "عنوان تمرین",
+        type: "string",
+        defaultValue: "پازل کلمات و گرامر",
+        category: "content",
+      },
+      {
+        name: "description",
+        label: "توضیحات راهنما",
+        type: "string",
+        defaultValue: "کلمات انگلیسی را برای ساخت جمله صحیح به ترتیب لمس کنید",
+        category: "content",
+      },
+      {
+        name: "autoShuffleBank",
+        label: "شافل خودکار کلمات مخزن",
+        type: "boolean",
+        defaultValue: true,
+        category: "behavior",
+        description: "به‌هم‌ریختن تصادفی کلمات مخزن برای به چالش کشیدن زبان‌آموز",
+      },
+      {
+        name: "autoPlayAudioOnSuccess",
+        label: "پخش خودکار صوت هنگام موفقیت",
+        type: "boolean",
+        defaultValue: true,
+        category: "behavior",
+      },
+      {
+        name: "isLocked",
+        label: "وضعیت قفل بودن (Locked)",
+        type: "boolean",
+        defaultValue: false,
+        category: "state",
+        description: "قفل کردن تعامل تا تکمیل کارت قبلی",
+      },
+    ],
+    presets: [
+      {
+        name: "default",
+        label: "حالت اولیه آماده پاسخ‌دهی",
+        props: { isLocked: false, autoShuffleBank: true, autoPlayAudioOnSuccess: true },
+      },
+      {
+        name: "locked",
+        label: "جلسه قفل شده",
+        props: { isLocked: true, lockMessage: "ابتدا واژگان و ویدیوی آموزشی درس را کامل کنید." },
+      },
+    ],
+    render: (props) => (
+      <div className="w-full flex items-center justify-center p-2 sm:p-6">
+        <GrammarCard
+          {...props}
+          onComplete={(res) => console.log("Grammar Card Completed:", res)}
+          onNext={() => console.log("Navigate to Next Card")}
+        />
+      </div>
+    ),
+    getCodeSnippet: (props) =>
+      `import { GrammarCard } from "@/components/organisms/grammar-card";\n\n<GrammarCard\n  cardLabel="${props.cardLabel || "کارت ۳: ساختار جمله و گرامر"}"\n  title="${props.title || "پازل کلمات و گرامر"}"\n  description="${props.description || "کلمات انگلیسی را برای ساخت جمله صحیح به ترتیب لمس کنید"}"\n  autoShuffleBank={${props.autoShuffleBank ?? true}}\n  autoPlayAudioOnSuccess={${props.autoPlayAudioOnSuccess ?? true}}\n  isLocked={${props.isLocked ?? false}}\n  onComplete={(result) => console.log("Completed:", result)}\n  onNext={() => console.log("Next Card")}\n/>`,
+    tags: ["Organism", "Card", "Grammar", "Puzzle", "FSM", "HeroUI", "Interactive", "Square"],
+  },
+  {
+    id: "dictation-card",
+    name: "DictationCard",
+    persianName: "کارت املای سریع صوتی (Dictation Card)",
+    category: "organisms",
+    description: "کارت چهارم میکرولرنینگ با ماشین وضعیت متناهی (FSM)، پخش تلفظ صوتی عبارات تخصصی مهندسی، اعتبارسنجی املای ورودی، تشخیص خطای تایپی جزئی با الگوریتم لون‌اشتاین (Typo Warning)، چیپ‌های کاراکتر ویژه، بهینه‌سازی کیبورد موبایل و گزارش عملکرد پایانی.",
+    filePath: "components/organisms/dictation-card.tsx",
+    dependencies: [
+      "@heroui/react Card",
+      "@heroui/react Button",
+      "@heroui/react ProgressBar",
+      "@heroui/react Chip",
+      "@heroui/react Spinner",
+      "@heroui/react TextField",
+      "@heroui/react InputGroup",
+      "@solar-icons/react",
+      "lucide-react",
+    ],
+    defaultViewport: "desktop",
+    defaultProps: {
+      cardLabel: "کارت ۴: املای سریع صوتی",
+      title: "املای سریع صوتی",
+      description: "به تلفظ صوتی گوش دهید و عبارت صحیح را تایپ کنید",
+      autoPlayOnLoad: false,
+      isLocked: false,
+      lockMessage: "برای شروع این بخش باید تمرین گرامر را کامل کنید.",
+    },
+    propDefinitions: [
+      {
+        name: "cardLabel",
+        label: "برچسب کارت",
+        type: "string",
+        defaultValue: "کارت ۴: املای سریع صوتی",
+        category: "content",
+      },
+      {
+        name: "title",
+        label: "عنوان تمرین",
+        type: "string",
+        defaultValue: "املای سریع صوتی",
+        category: "content",
+      },
+      {
+        name: "description",
+        label: "توضیحات راهنما",
+        type: "string",
+        defaultValue: "به تلفظ صوتی گوش دهید و عبارت صحیح را تایپ کنید",
+        category: "content",
+      },
+      {
+        name: "autoPlayOnLoad",
+        label: "پخش خودکار صوت در شروع",
+        type: "boolean",
+        defaultValue: false,
+        category: "behavior",
+        description: "پخش اتوماتیک فایل صوتی هنگام ورود به هر آیتم",
+      },
+      {
+        name: "isLocked",
+        label: "وضعیت قفل بودن (Locked)",
+        type: "boolean",
+        defaultValue: false,
+        category: "state",
+        description: "قفل کردن تعامل تا تکمیل کارت‌های پیش‌نیاز",
+      },
+    ],
+    presets: [
+      {
+        name: "default",
+        label: "حالت اولیه آماده تایپ",
+        props: { isLocked: false, autoPlayOnLoad: false },
+      },
+      {
+        name: "autoplay",
+        label: "حالت پخش خودکار صوتی",
+        props: { isLocked: false, autoPlayOnLoad: true },
+      },
+      {
+        name: "locked",
+        label: "جلسه قفل شده",
+        props: {
+          isLocked: true,
+          lockMessage: "ابتدا پازل کلمات و گرامر درس را با موفقیت پشت سر بگذارید.",
+        },
+      },
+    ],
+    render: (props) => (
+      <div className="w-full flex items-center justify-center p-2 sm:p-6">
+        <DictationCard
+          {...props}
+          onComplete={(res) => console.log("Dictation Card Completed:", res)}
+          onNext={() => console.log("Navigate to Next Lesson / Card")}
+        />
+      </div>
+    ),
+    getCodeSnippet: (props) =>
+      `import { DictationCard } from "@/components/organisms/dictation-card";\n\n<DictationCard\n  cardLabel="${props.cardLabel || "کارت ۴: املای سریع صوتی"}"\n  title="${props.title || "املای سریع صوتی"}"\n  description="${props.description || "به تلفظ صوتی گوش دهید و عبارت صحیح را تایپ کنید"}"\n  autoPlayOnLoad={${props.autoPlayOnLoad ?? false}}\n  isLocked={${props.isLocked ?? false}}\n  onComplete={(result) => console.log("Completed:", result)}\n  onNext={() => console.log("Next Step")}\n/>`,
+    tags: ["Organism", "Card", "Dictation", "Audio", "Typing", "FSM", "HeroUI", "Interactive", "Square"],
+  },
+  {
+    id: "pronunciation-card",
+    name: "PronunciationCard",
+    persianName: "کارت تلفظ و شنیداری (Pronunciation Card)",
+    category: "organisms",
+    description: "کارت تعاملی سنجش تلفظ و شنیداری بر پایه ماشین وضعیت متناهی (FSM)، چرخه حیات استریم صوتی، ویژوالایزر امواج فرکانسی (Waveform Indicator)، راهنمای بصری دهان و واج (Mouth & Phoneme Hint) و مدیریت تلاش مجدد.",
+    filePath: "components/organisms/pronunciation-card.tsx",
+    dependencies: [
+      "@heroui/react Card",
+      "@heroui/react Button",
+      "@heroui/react ProgressBar",
+      "@heroui/react Chip",
+      "@heroui/react Alert",
+      "@heroui/react Spinner",
+      "@solar-icons/react",
+      "lucide-react",
+    ],
+    defaultViewport: "desktop",
+    defaultProps: {
+      cardLabel: "کارت ۳: تلفظ و شنیداری",
+      title: "کارت تلفظ و شنیداری",
+      description: "به تلفظ صوتی گوش دهید و سپس واژه را با صدای واضح بیان کنید",
+      autoPlayReferenceOnLoad: false,
+      isLocked: false,
+      lockMessage: "برای شروع این بخش باید تمرینات قبلی را کامل کنید.",
+    },
+    propDefinitions: [
+      {
+        name: "cardLabel",
+        label: "برچسب کارت",
+        type: "string",
+        defaultValue: "کارت ۳: تلفظ و شنیداری",
+        category: "content",
+      },
+      {
+        name: "title",
+        label: "عنوان تمرین",
+        type: "string",
+        defaultValue: "کارت تلفظ و شنیداری",
+        category: "content",
+      },
+      {
+        name: "description",
+        label: "توضیحات راهنما",
+        type: "string",
+        defaultValue: "به تلفظ صوتی گوش دهید و سپس واژه را با صدای واضح بیان کنید",
+        category: "content",
+      },
+      {
+        name: "autoPlayReferenceOnLoad",
+        label: "پخش خودکار صدای الگو",
+        type: "boolean",
+        defaultValue: false,
+        category: "behavior",
+      },
+      {
+        name: "isLocked",
+        label: "وضعیت قفل بودن (Locked)",
+        type: "boolean",
+        defaultValue: false,
+        category: "state",
+      },
+    ],
+    presets: [
+      {
+        name: "default",
+        label: "حالت اولیه آماده ضبط",
+        props: { isLocked: false, autoPlayReferenceOnLoad: false },
+      },
+      {
+        name: "autoplay",
+        label: "پخش خودکار الگو",
+        props: { isLocked: false, autoPlayReferenceOnLoad: true },
+      },
+      {
+        name: "locked",
+        label: "جلسه قفل شده",
+        props: {
+          isLocked: true,
+          lockMessage: "برای باز شدن این بخش، کارت‌های قبلی را کامل کنید.",
+        },
+      },
+    ],
+    render: (props) => (
+      <div className="w-full flex items-center justify-center p-2 sm:p-6">
+        <PronunciationCard
+          {...props}
+          onComplete={(res) => console.log("Pronunciation Card Completed:", res)}
+          onNext={() => console.log("Navigate to Next Card")}
+        />
+      </div>
+    ),
+    getCodeSnippet: (props) =>
+      `import { PronunciationCard } from "@/components/organisms/pronunciation-card";\n\n<PronunciationCard\n  cardLabel="${props.cardLabel || "کارت ۳: تلفظ و شنیداری"}"\n  title="${props.title || "کارت تلفظ و شنیداری"}"\n  description="${props.description || "به تلفظ صوتی گوش دهید و سپس واژه را با صدای واضح بیان کنید"}"\n  autoPlayReferenceOnLoad={${props.autoPlayReferenceOnLoad ?? false}}\n  isLocked={${props.isLocked ?? false}}\n  onComplete={(result) => console.log("Completed:", result)}\n  onNext={() => console.log("Next Step")}\n/>`,
+    tags: ["Organism", "Card", "Pronunciation", "Speech", "Audio", "Waveform", "FSM", "HeroUI", "Interactive", "Square"],
+  },
+  {
+    id: "completion-card",
+    name: "CompletionCard",
+    persianName: "کارت پایان درس و پاداش (Completion Card)",
+    category: "organisms",
+    description: "کارت پایانی درس با ماشین وضعیت متناهی (FSM)، انیمیشن پاداش و شمارنده اعداد XP، نشانگر استریک روزانه، آمار عملکرد، واژگان نیازمند مرور (Spaced Repetition) و خروج فوری بدون مسدودسازی (Optimistic UI).",
+    filePath: "components/organisms/completion-card.tsx",
+    dependencies: [
+      "@heroui/react Card",
+      "@heroui/react Button",
+      "@heroui/react ProgressBar",
+      "@heroui/react Chip",
+      "@heroui/react Spinner",
+      "@solar-icons/react",
+      "lucide-react",
+    ],
+    defaultViewport: "desktop",
+    defaultProps: {
+      cardLabel: "کارت ۵: پایان درسنامه و پاداش",
+      title: "پایان درسنامه و ثبت امتیاز",
+      description: "عملکرد شما با موفقیت در سیستم ذخیره گردید",
+      lessonId: "lesson-deep-learning-101",
+      nextLessonId: "lesson-deep-learning-102",
+      nextLessonTitle: "درس ۲: الگوهای حافظه فعال و تکرار فضادار",
+      performanceSummary: {
+        totalScore: 120,
+        mistakeCount: 1,
+        timeSpentSeconds: 155,
+        accuracyPercentage: 92,
+      },
+      flaggedWords: ["Cognitive", "Architecture"],
+      streakData: {
+        currentCount: 5,
+        isExtendedToday: true,
+        previousCount: 4,
+      },
+      rewardAnimationDurationMs: 600,
+    },
+    propDefinitions: [
+      {
+        name: "cardLabel",
+        label: "برچسب کارت",
+        type: "string",
+        defaultValue: "کارت ۵: پایان درسنامه و پاداش",
+        category: "content",
+      },
+      {
+        name: "title",
+        label: "عنوان کارت",
+        type: "string",
+        defaultValue: "پایان درسنامه و ثبت امتیاز",
+        category: "content",
+      },
+      {
+        name: "description",
+        label: "توضیحات راهنما",
+        type: "string",
+        defaultValue: "عملکرد شما با موفقیت در سیستم ذخیره گردید",
+        category: "content",
+      },
+      {
+        name: "nextLessonTitle",
+        label: "عنوان درس بعدی",
+        type: "string",
+        defaultValue: "درس ۲: الگوهای حافظه فعال و تکرار فضادار",
+        category: "content",
+      },
+      {
+        name: "rewardAnimationDurationMs",
+        label: "مدت زمان انیمیشن (ms)",
+        type: "number",
+        defaultValue: 600,
+        category: "behavior",
+      },
+    ],
+    presets: [
+      {
+        name: "default",
+        label: "حالت استاندارد با استریک تمدید شده",
+        props: {
+          performanceSummary: {
+            totalScore: 120,
+            mistakeCount: 1,
+            timeSpentSeconds: 155,
+            accuracyPercentage: 92,
+          },
+          flaggedWords: ["Cognitive", "Architecture"],
+          streakData: {
+            currentCount: 5,
+            isExtendedToday: true,
+            previousCount: 4,
+          },
+        },
+      },
+      {
+        name: "perfect-score",
+        label: "عملکرد بی‌نقص (۱۰۰٪ دقت بدون خطا)",
+        props: {
+          performanceSummary: {
+            totalScore: 150,
+            mistakeCount: 0,
+            timeSpentSeconds: 110,
+            accuracyPercentage: 100,
+          },
+          flaggedWords: [],
+          streakData: {
+            currentCount: 12,
+            isExtendedToday: true,
+            previousCount: 11,
+          },
+        },
+      },
+      {
+        name: "first-streak",
+        label: "روز اول استریک کاربر",
+        props: {
+          performanceSummary: {
+            totalScore: 90,
+            mistakeCount: 2,
+            timeSpentSeconds: 210,
+            accuracyPercentage: 85,
+          },
+          flaggedWords: ["Grammar", "Syntax"],
+          streakData: {
+            currentCount: 1,
+            isExtendedToday: true,
+            previousCount: 0,
+          },
+        },
+      },
+      {
+        name: "streak-already-extended",
+        label: "استریک از قبل تمدید شده",
+        props: {
+          performanceSummary: {
+            totalScore: 100,
+            mistakeCount: 0,
+            timeSpentSeconds: 95,
+            accuracyPercentage: 100,
+          },
+          flaggedWords: [],
+          streakData: {
+            currentCount: 7,
+            isExtendedToday: false,
+          },
+        },
+      },
+    ],
+    render: (props) => (
+      <div className="w-full flex items-center justify-center p-2 sm:p-6">
+        <CompletionCard
+          {...props}
+          onCompleteLesson={(payload) => {
+            console.log("Sync to backend payload (Optimistic background):", payload);
+          }}
+          onNavigateNext={(nextId) => {
+            console.log("Navigating to next lesson:", nextId);
+          }}
+        />
+      </div>
+    ),
+    getCodeSnippet: (props) =>
+      `import { CompletionCard } from "@/components/organisms/completion-card";\n\n<CompletionCard\n  lessonId="${props.lessonId || "lesson-1"}"\n  nextLessonId="${props.nextLessonId || "lesson-2"}"\n  performanceSummary={${JSON.stringify(props.performanceSummary || { totalScore: 120, mistakeCount: 1, timeSpentSeconds: 155 })}}\n  flaggedWords={${JSON.stringify(props.flaggedWords || ["Cognitive"])}}\n  streakData={${JSON.stringify(props.streakData || { currentCount: 5, isExtendedToday: true })}}\n  onCompleteLesson={async (payload) => await syncLessonProgress(payload)}\n  onNavigateNext={(nextId) => router.push(\`/lessons/\${nextId}\`)}\n/>`,
+    tags: ["Organism", "Card", "Completion", "Reward", "FSM", "Streak", "HeroUI", "Interactive", "Square"],
   },
   {
     id: "video-player",

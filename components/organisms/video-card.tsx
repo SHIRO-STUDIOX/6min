@@ -1,17 +1,12 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import {
-  Card,
-  Button,
-  ProgressBar,
-} from "@heroui/react";
+import { Button } from "@heroui/react";
 import { PlayIcon } from "@solar-icons/react/bold/play";
 import { RestartIcon } from "@solar-icons/react/linear/restart";
-import { CheckCircleIcon } from "@solar-icons/react/bold/check-circle";
 import { LockIcon } from "@solar-icons/react/bold/lock";
-import { AltArrowLeftIcon } from "@solar-icons/react/linear/alt-arrow-left";
 import { StarsIcon } from "@solar-icons/react/bold/stars";
+import { BaseCard } from "@/components/molecules/base-card";
 
 export interface VideoCardProps {
   /** برچسب نوع کارت (مثلاً کارت ۱: ویدیوی آموزشی) */
@@ -140,133 +135,22 @@ export function VideoCard({
   };
 
   return (
-    <Card
-      className={`w-full max-w-[500px] aspect-square flex flex-col justify-between p-6 bg-content1/90 backdrop-blur-xl border-none shadow-none rounded-3xl overflow-hidden transition-all duration-300 select-none ${className}`}
-    >
-      {/* ======================================================== */}
-      {/* ۱. هدر کارت (Card Header) */}
-      {/* ======================================================== */}
-      <Card.Header className="p-0 flex flex-col gap-0.5 shrink-0 text-start">
-        <Card.Title
-          render={(props) => <h4 {...props} />}
-          className="text-xl font-semibold text-foreground tracking-tight leading-[1.33] line-clamp-1"
-        >
-          {title}
-        </Card.Title>
-        {description && (
-          <Card.Description className="text-xs font-normal text-default-500 leading-tight line-clamp-1">
-            {description}
-          </Card.Description>
-        )}
-      </Card.Header>
-
-      {/* ======================================================== */}
-      {/* ۲. بخش ویدیو و پیش‌نمایش (Video Preview / Playback Area) */}
-      {/* نسبت دقیق 16:9 */}
-      {/* ======================================================== */}
-      <Card.Content className="p-0 my-auto w-full flex flex-col justify-center">
-        <div
-          ref={videoContainerRef}
-          onClick={handleTogglePlay}
-          className="relative w-full aspect-video rounded-2xl overflow-hidden border border-divider bg-black/90 group/video shadow-md transition-all duration-300 isolate cursor-pointer"
-        >
-          {/* المان ویدیویی در صورت وجود سورس */}
-          {videoSrc && (
-            <video
-              ref={videoElementRef}
-              src={videoSrc}
-              className="w-full h-full object-cover"
-            />
-          )}
-
-          {/* لایه گرادیانت و افکت نوری شیشه‌ای */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-black/30 pointer-events-none" />
-
-          {/* پترن مدرن ذرات */}
-          <div className="absolute inset-0 bg-[radial-gradient(#ffffff12_1px,transparent_1px)] [background-size:16px_16px] opacity-40 pointer-events-none" />
-
-          {/* وضعیت قفل بودن */}
-          {isLocked ? (
-            <div className="absolute inset-0 z-30 bg-black/80 backdrop-blur-md flex flex-col items-center justify-center p-4 text-center pointer-events-auto">
-              <div className="size-10 rounded-full bg-default-800 border border-white/10 flex items-center justify-center text-default-400 mb-2">
-                <LockIcon className="size-5" />
-              </div>
-              <span className="text-xs font-bold text-white mb-1">جلسه قفل است</span>
-              <span className="text-[10px] text-default-400 max-w-[220px] leading-tight line-clamp-2">
-                {lockMessage}
-              </span>
-            </div>
-          ) : (
-            /* دکمه Play مرکزی شیشه‌ای در حالت توقف */
-            !isPlaying && (
-              <div className="absolute inset-0 flex items-center justify-center z-20 group/playbtn pointer-events-none">
-                <div className="size-12 sm:size-14 rounded-full glass-rim bg-white/20 dark:bg-black/50 backdrop-blur-xl border border-white/30 flex items-center justify-center text-white shadow-2xl transition-all duration-300 group-hover/video:scale-110 group-hover/video:bg-white/30 active:scale-95">
-                  {currentTime >= duration ? (
-                    <RestartIcon className="size-5 sm:size-6 drop-shadow" />
-                  ) : (
-                    <PlayIcon className="size-5 sm:size-6 fill-white ms-0.5 drop-shadow" />
-                  )}
-                </div>
-              </div>
-            )
-          )}
-        </div>
-      </Card.Content>
-
-      {/* ======================================================== */}
-      {/* ۳. بخش پیشرفت و وضعیت تماشا (Progress Indicator) */}
-      {/* ======================================================== */}
-      <div className="shrink-0 flex flex-col gap-1.5 my-1">
-        <div className="w-full flex items-center justify-between text-[11px] sm:text-xs">
-          <span className="font-medium text-default-500 flex items-center gap-1">
-            {isCompleted ? (
-              <span className="text-success font-bold flex items-center gap-1">
-                <CheckCircleIcon className="size-3.5" />
-                آماده برای کارت بعدی
-              </span>
-            ) : (
-              <span>میزان تماشا:</span>
-            )}
-          </span>
-
-          <span
-            className={`font-mono font-bold font-tabular ${
-              isCompleted ? "text-success" : "text-accent"
-            }`}
-            dir="ltr"
-          >
-            {Math.round(progressPercentage)}% watched
-          </span>
-        </div>
-
-        {/* نوار پیشرفت با HeroUI ProgressBar */}
-        <ProgressBar
-          aria-label="میزان مشاهده ویدیو"
-          minValue={0}
-          maxValue={100}
-          value={progressPercentage}
-          className="w-full"
-          dir="ltr"
-        >
-          <ProgressBar.Track className="h-1.5 sm:h-2 bg-default-200/70 dark:bg-default-800/80 rounded-full overflow-hidden w-full">
-            <ProgressBar.Fill
-              className={`!start-0 !left-0 left-0 rounded-full transition-all duration-300 ${
-                isCompleted
-                  ? "bg-gradient-to-r from-success to-success/80"
-                  : "bg-gradient-to-r from-accent to-accent/80"
-              }`}
-              style={{ width: `${progressPercentage}%` }}
-            />
-          </ProgressBar.Track>
-        </ProgressBar>
-      </div>
-
-      {/* ======================================================== */}
-      {/* ۴. ناوبری و اکشن‌های کارت (Card Actions / Navigation) */}
-      {/* حرکت به سمت راست و دکمه Forward در سمت راست */}
-      {/* ======================================================== */}
-      <Card.Footer className="p-0 pt-2 flex items-center justify-between shrink-0">
-        {/* سمت راست: دکمه‌های کنترل جانبی یا شروع مجدد */}
+    <BaseCard
+      cardLabel={cardLabel}
+      title={title}
+      description={description}
+      progressPercentage={progressPercentage}
+      progressLabel="میزان تماشا:"
+      progressText={`${Math.round(progressPercentage)}% watched`}
+      isCompleted={isCompleted}
+      completedStatusText="آماده برای کارت بعدی"
+      isLocked={isLocked}
+      lockMessage={lockMessage}
+      progressBarAriaLabel="میزان مشاهده ویدیو"
+      nextButtonText="کارت بعدی"
+      onNext={onNext}
+      className={className}
+      footerStart={
         <div className="flex items-center gap-1.5">
           {currentTime > 0 && (
             <Button
@@ -275,6 +159,7 @@ export function VideoCard({
               isIconOnly
               onClick={handleRestart}
               aria-label="مشاهده مجدد ویدیو"
+              className="text-muted hover:text-foreground"
             >
               <RestartIcon className="size-3.5" />
             </Button>
@@ -287,20 +172,54 @@ export function VideoCard({
             </div>
           )}
         </div>
+      }
+    >
+      <div
+        ref={videoContainerRef}
+        onClick={handleTogglePlay}
+        className="relative w-full aspect-video rounded-2xl overflow-hidden border border-separator bg-black/90 group/video shadow-md transition-all duration-300 isolate cursor-pointer"
+      >
+        {/* المان ویدیویی در صورت وجود سورس */}
+        {videoSrc && (
+          <video
+            ref={videoElementRef}
+            src={videoSrc}
+            className="w-full h-full object-cover"
+          />
+        )}
 
-        {/* سمت چپ: اکشن اصلی به کارت بعدی */}
-        <div className="flex items-center gap-2">
-          <Button
-            variant={isCompleted ? "primary" : "secondary"}
-            size="sm"
-            isDisabled={!isCompleted || isLocked}
-            onClick={onNext}
-          >
-            <span>کارت بعدی</span>
-            <AltArrowLeftIcon className="size-3.5 sm:size-4 ms-1 transition-transform group-hover:translate-x-0.5" />
-          </Button>
-        </div>
-      </Card.Footer>
-    </Card>
+        {/* لایه گرادیانت و افکت نوری شیشه‌ای */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-black/30 pointer-events-none" />
+
+        {/* پترن مدرن ذرات */}
+        <div className="absolute inset-0 bg-[radial-gradient(#ffffff12_1px,transparent_1px)] [background-size:16px_16px] opacity-40 pointer-events-none" />
+
+        {/* وضعیت قفل بودن */}
+        {isLocked ? (
+          <div className="absolute inset-0 z-30 bg-black/80 backdrop-blur-md flex flex-col items-center justify-center p-4 text-center pointer-events-auto">
+            <div className="size-10 rounded-full bg-surface-secondary border border-separator flex items-center justify-center text-muted mb-2">
+              <LockIcon className="size-5" />
+            </div>
+            <span className="text-xs font-bold text-foreground mb-1">جلسه قفل است</span>
+            <span className="text-[10px] text-muted max-w-[220px] leading-tight line-clamp-2">
+              {lockMessage}
+            </span>
+          </div>
+        ) : (
+          /* دکمه Play مرکزی شیشه‌ای در حالت توقف */
+          !isPlaying && (
+            <div className="absolute inset-0 flex items-center justify-center z-20 group/playbtn pointer-events-none">
+              <div className="size-12 sm:size-14 rounded-full glass-rim bg-white/20 dark:bg-black/50 backdrop-blur-xl border border-white/30 flex items-center justify-center text-white shadow-2xl transition-all duration-300 group-hover/video:scale-110 group-hover/video:bg-white/30 active:scale-95">
+                {currentTime >= duration ? (
+                  <RestartIcon className="size-5 sm:size-6 drop-shadow" />
+                ) : (
+                  <PlayIcon className="size-5 sm:size-6 fill-white ms-0.5 drop-shadow" />
+                )}
+              </div>
+            </div>
+          )
+        )}
+      </div>
+    </BaseCard>
   );
 }

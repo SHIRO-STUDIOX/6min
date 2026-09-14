@@ -606,6 +606,7 @@ export function VideoPlayer({
               minValue={0}
               maxValue={duration}
               value={currentTime}
+              color="accent"
               className="w-full"
               dir="ltr"
             >
@@ -617,11 +618,8 @@ export function VideoPlayer({
                     style={{ width: `${maxWatchedPercentage}%` }}
                   />
                 )}
-                {/* نوار اصلی پر شده با انکر چپ قطعی */}
-                <ProgressBar.Fill
-                  className="!start-0 !left-0 left-0 bg-gradient-to-r from-accent to-accent/90 rounded-full !transition-[width] !duration-100"
-                  style={{ width: `${progressPercentage}%` }}
-                />
+                {/* نوار اصلی پر شده با استایل‌های رسمی HeroUI */}
+                <ProgressBar.Fill className="rounded-full" />
               </ProgressBar.Track>
             </ProgressBar>
 

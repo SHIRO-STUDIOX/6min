@@ -126,7 +126,11 @@ export function SandboxControls() {
                       isSelected={Boolean(currentValue)}
                       onChange={(val) => updateProp(propDef.name, val)}
                       aria-label={propDef.label}
-                    />
+                    >
+                      <Switch.Control>
+                        <Switch.Thumb />
+                      </Switch.Control>
+                    </Switch>
                   </div>
                 )}
 

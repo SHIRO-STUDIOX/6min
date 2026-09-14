@@ -5,10 +5,12 @@ import {
   Button,
   TextField,
   InputGroup,
+  Label,
   FieldError,
+  Link,
   Spinner,
 } from "@heroui/react";
-import { Phone, ShieldCheck, Sparkles } from "lucide-react";
+import { Phone, ShieldCheck } from "lucide-react";
 
 export interface PhoneLoginProps {
   title?: string;
@@ -86,34 +88,31 @@ export function PhoneLogin({
         </p>
       </div>
 
-      {/* ۲. فرم ورودی شماره موبایل */}
+      {/* ۲. فرم ورودی شماره موبایل با HeroUI v3 Compound Components */}
       <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
-        <div className="w-full flex flex-col gap-1.5 text-right">
-          <label
-            htmlFor="phone-input"
-            className="text-xs font-bold text-foreground ps-1"
-          >
+        <TextField
+          name="phone"
+          isInvalid={hasError}
+          className="w-full flex flex-col gap-1.5 text-start"
+        >
+          <Label className="text-xs font-bold text-foreground ps-1">
             شماره موبایل
-          </label>
+          </Label>
 
-          {/* فیلد ورودی شماره با استایل کپسولی و پیشوند پیشرفته */}
-          <div
-            className={`w-full h-12 px-3 rounded-full bg-default-100/70 hover:bg-default-100/90 focus-within:bg-background focus-within:ring-2 border transition-all flex items-center justify-between ${
-              hasError
-                ? "border-danger focus-within:ring-danger/30"
-                : "border-default-200/70 focus-within:border-accent focus-within:ring-accent/20"
-            }`}
+          <InputGroup
+            variant="secondary"
+            className="w-full h-12 px-3 rounded-full border border-separator/60 transition-all flex items-center justify-between"
           >
-            {/* آیکون گوشی و کد کشور */}
-            <div className="flex items-center gap-1.5 text-muted ps-1">
+            {/* پیشوند: آیکون گوشی و کد کشور */}
+            <InputGroup.Prefix className="pe-1 flex items-center gap-1.5 text-muted">
               <Phone className="size-4" />
-              <span className="text-xs font-mono font-bold text-muted" dir="ltr">
+              <span className="text-xs font-mono font-bold" dir="ltr">
                 +۹۸
               </span>
-            </div>
+            </InputGroup.Prefix>
 
             {/* ورودی شماره تلفن */}
-            <input
+            <InputGroup.Input
               id="phone-input"
               type="tel"
               inputMode="numeric"
@@ -126,52 +125,49 @@ export function PhoneLogin({
               dir="ltr"
             />
 
-            {/* نشانگر وضعیت اعتبارسنجی */}
-            <div className="size-6 flex items-center justify-center pe-1">
+            {/* پسوند: نشانگر وضعیت اعتبارسنجی */}
+            <InputGroup.Suffix className="ps-1 flex items-center justify-center">
               {isPhoneValid && (
                 <div className="size-5 rounded-full bg-success/20 text-success flex items-center justify-center animate-in zoom-in-75">
                   <ShieldCheck className="size-3.5" />
                 </div>
               )}
-            </div>
-          </div>
+            </InputGroup.Suffix>
+          </InputGroup>
 
-          {/* پیام خطا */}
-          {hasError && (
-            <span className="text-[11px] text-danger font-medium ps-2 animate-in fade-in slide-in-from-top-1">
-              {errorMessage}
-            </span>
-          )}
-        </div>
+          {/* پیام خطای استاندارد با FieldError */}
+          <FieldError className="text-[11px] text-danger font-medium ps-2 animate-in fade-in slide-in-from-top-1">
+            {errorMessage}
+          </FieldError>
+        </TextField>
 
-        {/* ۳. دکمه ورود */}
+        {/* ۳. دکمه ورود با isPending رسمی */}
         <Button
           type="submit"
           variant="primary"
-          isDisabled={isLoading || (touched && !isPhoneValid)}
+          isPending={isLoading}
+          isDisabled={touched && !isPhoneValid}
           className="w-full h-12 rounded-full font-bold text-sm shadow-lg shadow-accent/25 hover:shadow-accent/40 active:scale-[0.985] transition-all flex items-center justify-center gap-2 cursor-pointer"
         >
-          {isLoading ? (
-            <div className="flex items-center gap-2">
-              <Spinner size="sm" color="current" />
-              <span>در حال ارسال کد...</span>
-            </div>
-          ) : (
-            <span>{buttonText}</span>
+          {({ isPending }) => (
+            <>
+              {isPending && <Spinner size="sm" color="current" />}
+              <span>{isPending ? "در حال ارسال کد..." : buttonText}</span>
+            </>
           )}
         </Button>
       </form>
 
-      {/* ۴. متن قوانین و حریم خصوصی در پایین فرم */}
+      {/* ۴. متن قوانین و حریم خصوصی با HeroUI Link */}
       <div className="mt-8 text-center text-[11px] text-muted leading-relaxed max-w-xs">
         با ورود یا ثبت‌نام،{" "}
-        <a href="#" className="text-accent underline underline-offset-4 hover:opacity-80">
+        <Link href="#" className="text-[11px] text-accent font-medium hover:underline">
           قوانین و مقررات
-        </a>{" "}
+        </Link>{" "}
         و{" "}
-        <a href="#" className="text-accent underline underline-offset-4 hover:opacity-80">
+        <Link href="#" className="text-[11px] text-accent font-medium hover:underline">
           حریم خصوصی
-        </a>{" "}
+        </Link>{" "}
         سیکسمین را می‌پذیرید.
       </div>
     </div>
