@@ -9,6 +9,7 @@ import { GrammarCard } from "@/components/organisms/grammar-card";
 import { DictationCard } from "@/components/organisms/dictation-card";
 import { PronunciationCard } from "@/components/organisms/pronunciation-card";
 import { CompletionCard } from "@/components/organisms/completion-card";
+import { StageIndicator } from "@/components/molecules/StageIndicator";
 
 export const sandboxRegistry: SandboxComponent[] = [
   // ==========================================
@@ -1038,6 +1039,204 @@ export const sandboxRegistry: SandboxComponent[] = [
     getCodeSnippet: (props) =>
       `import { FloatingHeader } from "@/components/organisms/floating-header";\n\n<FloatingHeader\n  brandTitle="${props.brandTitle || "۶دقیقه"}"\n  isLoggedIn={${props.isLoggedIn ?? true}}\n  userName="${props.userName || "علی رضوانی"}"\n  userRole="${props.userRole || "دانشجوی سطح پیشرفته"}"\n  activeNavItem="${props.activeNavItem || "home"}"\n/>`,
     tags: ["Organism", "Header", "Navigation", "Profile", "Floating", "Pill", "Glassmorphic"],
+  },
+  // ==========================================
+  // MOLECULES
+  // ==========================================
+  {
+    id: "stage-indicator",
+    name: "StageIndicator",
+    persianName: "نشانگر مراحل کلاس درس (Stage Indicator)",
+    category: "molecules",
+    description: "نشانگر ۵ دات مینیمال با کپسول شیشه‌ای فلوئید، ماتریس وضعیت‌های حل و مرور و ابعاد ثابت ۶ پیکسل بدون جهش اسکلتی.",
+    filePath: "components/molecules/StageIndicator/stage-indicator.tsx",
+    dependencies: [
+      "@heroui/react",
+    ],
+    defaultViewport: "desktop",
+    defaultProps: {
+      currentIndex: 0,
+      step1Status: "upcoming",
+      step2Status: "upcoming",
+      step3Status: "upcoming",
+      step4Status: "upcoming",
+      step5Status: "upcoming",
+    },
+    propDefinitions: [
+      {
+        name: "currentIndex",
+        label: "موقعیت کارت جاری (۰ تا ۴)",
+        type: "number",
+        min: 0,
+        max: 4,
+        step: 1,
+        defaultValue: 0,
+        category: "state",
+        description: "تعیین کارتی که هم‌اکنون در مرکز دید قرار دارد",
+      },
+      {
+        name: "step1Status",
+        label: "وضعیت مرحله ۱",
+        type: "select",
+        options: [
+          { label: "پیش‌رو / دست‌نخورده (Upcoming)", value: "upcoming" },
+          { label: "موفقیت کامل (Success)", value: "success" },
+          { label: "نیاز به مرور (Warning)", value: "warning" },
+          { label: "عدم موفقیت (Danger)", value: "danger" },
+        ],
+        defaultValue: "upcoming",
+        category: "state",
+      },
+      {
+        name: "step2Status",
+        label: "وضعیت مرحله ۲",
+        type: "select",
+        options: [
+          { label: "پیش‌رو / دست‌نخورده (Upcoming)", value: "upcoming" },
+          { label: "موفقیت کامل (Success)", value: "success" },
+          { label: "نیاز به مرور (Warning)", value: "warning" },
+          { label: "عدم موفقیت (Danger)", value: "danger" },
+        ],
+        defaultValue: "upcoming",
+        category: "state",
+      },
+      {
+        name: "step3Status",
+        label: "وضعیت مرحله ۳",
+        type: "select",
+        options: [
+          { label: "پیش‌رو / دست‌نخورده (Upcoming)", value: "upcoming" },
+          { label: "موفقیت کامل (Success)", value: "success" },
+          { label: "نیاز به مرور (Warning)", value: "warning" },
+          { label: "عدم موفقیت (Danger)", value: "danger" },
+        ],
+        defaultValue: "upcoming",
+        category: "state",
+      },
+      {
+        name: "step4Status",
+        label: "وضعیت مرحله ۴",
+        type: "select",
+        options: [
+          { label: "پیش‌رو / دست‌نخورده (Upcoming)", value: "upcoming" },
+          { label: "موفقیت کامل (Success)", value: "success" },
+          { label: "نیاز به مرور (Warning)", value: "warning" },
+          { label: "عدم موفقیت (Danger)", value: "danger" },
+        ],
+        defaultValue: "upcoming",
+        category: "state",
+      },
+      {
+        name: "step5Status",
+        label: "وضعیت مرحله ۵",
+        type: "select",
+        options: [
+          { label: "پیش‌رو / دست‌نخورده (Upcoming)", value: "upcoming" },
+          { label: "موفقیت کامل (Success)", value: "success" },
+          { label: "نیاز به مرور (Warning)", value: "warning" },
+          { label: "عدم موفقیت (Danger)", value: "danger" },
+        ],
+        defaultValue: "upcoming",
+        category: "state",
+      },
+    ],
+    presets: [
+      {
+        name: "initial-step",
+        label: "شروع کلاس (کارت اول فعال)",
+        props: {
+          currentIndex: 0,
+          step1Status: "upcoming",
+          step2Status: "upcoming",
+          step3Status: "upcoming",
+          step4Status: "upcoming",
+          step5Status: "upcoming",
+        },
+      },
+      {
+        name: "in-progress",
+        label: "در حال پیشرفت (کارت ۳ فعال)",
+        props: {
+          currentIndex: 2,
+          step1Status: "success",
+          step2Status: "success",
+          step3Status: "upcoming",
+          step4Status: "upcoming",
+          step5Status: "upcoming",
+        },
+      },
+      {
+        name: "active-review",
+        label: "مرور کارت حل‌شده (Active Review)",
+        props: {
+          currentIndex: 0,
+          step1Status: "success",
+          step2Status: "success",
+          step3Status: "warning",
+          step4Status: "upcoming",
+          step5Status: "upcoming",
+        },
+      },
+      {
+        name: "mixed-outcomes",
+        label: "ترکیب نتایج (موفقیت، هشدار، خطا)",
+        props: {
+          currentIndex: 3,
+          step1Status: "success",
+          step2Status: "warning",
+          step3Status: "danger",
+          step4Status: "upcoming",
+          step5Status: "upcoming",
+        },
+      },
+      {
+        name: "all-completed",
+        label: "پایان کلاس (همه موفقیت‌آمیز)",
+        props: {
+          currentIndex: 4,
+          step1Status: "success",
+          step2Status: "success",
+          step3Status: "success",
+          step4Status: "success",
+          step5Status: "success",
+        },
+      },
+    ],
+    render: (props) => {
+      const statuses = [
+        props.step1Status || "upcoming",
+        props.step2Status || "upcoming",
+        props.step3Status || "upcoming",
+        props.step4Status || "upcoming",
+        props.step5Status || "upcoming",
+      ];
+      return (
+        <div className="w-full min-h-[300px] relative rounded-3xl overflow-hidden bg-background flex flex-col items-center justify-center p-8 border border-default-200/60 shadow-inner">
+          {/* پس‌زمینه ابری/آسمان کلاس درس برای سنجش ترنسپرنسی کپسول شیشه‌ای */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
+            <div className="absolute top-4 right-1/4 size-72 rounded-full bg-gradient-to-br from-blue-500/25 via-indigo-500/20 to-sky-400/20 blur-3xl" />
+            <div className="absolute bottom-4 left-1/4 size-64 rounded-full bg-gradient-to-tr from-cyan-400/30 via-emerald-400/20 to-teal-500/15 blur-3xl" />
+            <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] dark:bg-[radial-gradient(#27272a_1px,transparent_1px)] [background-size:20px_20px] opacity-35" />
+          </div>
+
+          <div className="relative z-10 flex flex-col items-center gap-4">
+            <StageIndicator
+              currentIndex={Number(props.currentIndex ?? 0)}
+              statuses={statuses}
+              onStepClick={(idx) => {
+                console.log("Navigating to completed card index:", idx);
+              }}
+            />
+            <span className="text-xs text-muted font-mono dir-ltr">
+              Active Card: {Number(props.currentIndex ?? 0) + 1} of 5
+            </span>
+          </div>
+        </div>
+      );
+    },
+    getCodeSnippet: (props) =>
+      `import { StageIndicator } from "@/components/molecules/StageIndicator";\n\n<StageIndicator\n  currentIndex={${props.currentIndex ?? 0}}\n  statuses={["${props.step1Status || "upcoming"}", "${props.step2Status || "upcoming"}", "${props.step3Status || "upcoming"}", "${props.step4Status || "upcoming"}", "${props.step5Status || "upcoming"}"]}\n  onStepClick={(index) => handleNavigate(index)}\n/>`,
+    tags: ["Molecule", "StageIndicator", "Dots", "Progress", "Classroom", "Navigation", "Minimal"],
   },
 ];
 
