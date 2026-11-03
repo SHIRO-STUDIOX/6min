@@ -114,8 +114,9 @@ export function useGrammarFsm({
   const [selectedTokens, setSelectedTokens] = useState<GrammarToken[]>([]);
   const [allBankTokens, setAllBankTokens] = useState<GrammarToken[]>(() => {
     const initialSentence = sentences[initialSentenceIndex] || sentences[0];
+    // رندر اولیه قطعی بدون شافل برای هماهنگی با SSR و پیشگیری از خطای Hydration Mismatch
     return initialSentence
-      ? buildSentenceTokens(initialSentence, autoShuffleBank)
+      ? buildSentenceTokens(initialSentence, false)
       : [];
   });
   const [isLocked, setIsLocked] = useState<boolean>(false);

@@ -40,6 +40,7 @@ export default function RootLayout({
     <html suppressHydrationWarning dir="rtl" lang="fa">
       <head />
       <body
+        suppressHydrationWarning
         className={clsx(
           "h-screen w-screen overflow-hidden text-foreground bg-background font-sans antialiased selection:bg-accent/20",
         )}

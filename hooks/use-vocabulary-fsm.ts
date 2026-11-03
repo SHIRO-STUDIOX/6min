@@ -143,7 +143,8 @@ export function useVocabularyFsm({
       audioSrc: pair.target.audioSrc,
       metadata: pair.target.metadata,
     }));
-    return autoShuffleTarget ? shuffleArray(rawTargets) : rawTargets;
+    // بازگردانی اولیه به‌صورت قطعی برای جلوگیری از خطای Hydration Mismatch در SSR
+    return rawTargets;
   });
 
   // در صورت تغییر لیست pairs از بیرون، بازتنظیم داده‌ها
