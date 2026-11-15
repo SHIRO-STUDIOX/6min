@@ -81,15 +81,13 @@ test("S9 profile persists name and private avatar; malformed upload preserves it
   const src = await image.getAttribute("src");
   await page.reload();
   await expect(page.getByAltText("تصویر پروفایل")).toHaveAttribute("src", src!);
-  await page
-    .locator('input[type="file"]')
-    .setInputFiles({
-      name: "bad.png",
-      mimeType: "image/png",
-      buffer: Buffer.from("bad"),
-    });
+  await page.locator('input[type="file"]').setInputFiles({
+    name: "bad.png",
+    mimeType: "image/png",
+    buffer: Buffer.from("bad"),
+  });
   await expect(
-    page.getByRole("alert").filter({ hasText: "درخواست انجام نشد" }),
+    page.getByRole("alert").filter({ hasText: "تصویر معتبر" }),
   ).toBeVisible();
   await expect(page.getByAltText("تصویر پروفایل")).toHaveAttribute("src", src!);
   await page

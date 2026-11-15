@@ -1,4 +1,10 @@
 const messages: Record<string, string> = {
+  PAYMENT_PROVIDER_UNAVAILABLE:
+    "سرویس پرداخت پیکربندی نشده است؛ پرداخت واقعی فعال نیست.",
+  PAYMENT_VERIFICATION_FAILED: "نتیجه پرداخت تأیید نشد؛ دسترسی ایجاد نشده است.",
+  INVALID_PROFILE: "نام نمایشی معتبر بین ۱ تا ۸۰ نویسه وارد کنید.",
+  INVALID_AVATAR: "تصویر معتبر PNG، JPEG یا WebP انتخاب کنید.",
+  AVATAR_TOO_LARGE: "حجم تصویر باید حداکثر ۲ مگابایت باشد.",
   AUTHENTICATION_FAILED: "کد یا اطلاعات ورود نامعتبر یا منقضی است.",
   AUTHENTICATION_REQUIRED: "برای ادامه دوباره وارد حساب شوید.",
   RESEND_COOLDOWN: "برای دریافت کد جدید، کمی صبر کنید.",

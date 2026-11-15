@@ -19,6 +19,8 @@ jobs:
       SHISH_DEMO_MODE: '1'
       SHISH_ENV: test
       SHISH_SMS_PROVIDER: mock
+      SHISH_PAYMENT_PROVIDER: mock
+      SHISH_MOCK_PAYMENT_SECRET: ci-only-public-mock-fixture-key-never-production
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
