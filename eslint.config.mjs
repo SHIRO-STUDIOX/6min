@@ -32,7 +32,6 @@ export default defineConfig([globalIgnores([
     "**/dist",
     "esm/*",
     "public/*",
-    "scripts/*",
     "**/*.config.js",
     "**/.DS_Store",
     "**/node_modules",
@@ -152,4 +151,10 @@ export default defineConfig([globalIgnores([
             next: ["const", "let", "var"],
         }],
     },
+}, {
+    files: ["lib/domain/**/*.ts"],
+    rules: { "no-restricted-imports": ["error", { patterns: ["react", "react-dom", "next/*", "**/server/*", "**/app/*", "pg", "drizzle-orm*"] }] },
+}, {
+    files: ["components/**/*.{ts,tsx}", "hooks/**/*.{ts,tsx}"],
+    rules: { "no-restricted-imports": ["error", { patterns: ["@/lib/server/*", "**/lib/server/*", "pg", "drizzle-orm*"] }] },
 }]);

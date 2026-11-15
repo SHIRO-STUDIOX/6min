@@ -3,6 +3,19 @@ on: [push, pull_request]
 jobs:
   quality:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: shish
+          POSTGRES_PASSWORD: ci-only-isolated
+          POSTGRES_DB: shish_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql://shish:ci-only-isolated@localhost:5432/shish_test
+      SHISH_DEMO_MODE: '1'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -11,6 +24,9 @@ jobs:
       - run: npm install --package-lock=false
       - run: npm run lint
       - run: npm test
+      - run: npm run db:migrate
+      - run: npm run db:seed
+      - run: npm run test:integration
       - run: npm run build
         env:
           NEXT_TELEMETRY_DISABLED: '1'

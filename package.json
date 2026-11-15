@@ -11,17 +11,22 @@
     "lint": "eslint . --no-fix",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "test:e2e": "playwright test"
+    "test": "vitest run tests/unit",
+    "test:e2e": "playwright test",
+    "test:integration": "node --env-file-if-exists=.env.local node_modules/vitest/vitest.mjs run tests/integration",
+    "db:migrate": "node --env-file-if-exists=.env.local --import tsx scripts/db-migrate.ts",
+    "db:seed": "node --env-file-if-exists=.env.local --import tsx scripts/db-seed.ts"
   },
   "dependencies": {
     "@heroui/react": "3.2.4",
     "@heroui/styles": "3.2.4",
     "clsx": "2.1.1",
+    "drizzle-orm": "0.44.7",
     "intl-messageformat": "10.7.16",
     "lucide-react": "^1.31.0",
     "next": "16.2.6",
     "next-themes": "0.4.6",
+    "pg": "8.16.3",
     "react": "19.2.6",
     "react-dom": "19.2.6"
   },
@@ -33,6 +38,7 @@
     "@playwright/test": "1.56.1",
     "@tailwindcss/postcss": "4.1.11",
     "@types/node": "20.9.0",
+    "@types/pg": "8.15.5",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "@typescript-eslint/eslint-plugin": "8.34.1",
@@ -52,7 +58,11 @@
     "prettier": "3.5.3",
     "tailwind-variants": "3.3.0",
     "tailwindcss": "4.1.11",
+    "tsx": "4.20.6",
     "typescript": "5.6.3",
     "vitest": "3.2.4"
+  },
+  "engines": {
+    "node": ">=24"
   }
 }

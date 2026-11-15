@@ -2,6 +2,16 @@ import { expect, test } from "@playwright/test";
 
 const ids = ["video-card", "vocabulary-card", "grammar-card", "dictation-card", "pronunciation-card", "completion-card", "video-player", "phone-login", "floating-header", "stage-indicator"];
 
+test("S1 health endpoint reports nonsecret database readiness", async ({ request }) => {
+  const response = await request.get("/api/v1/health");
+  expect(response.status()).toBe(200);
+  const body = await response.json();
+  expect(body.data).toEqual({ ready: true });
+  expect(Object.keys(body).sort()).toEqual(["data", "meta"]);
+  expect(body.meta.version).toBe("v1");
+  expect(response.headers()["cache-control"]).toBe("no-store");
+});
+
 test("baseline Sandbox catalog filters and selects a component", async ({ page }) => {
   await page.goto("/sandbox");
   await expect(page.getByText("HeroUI Sandbox", { exact: true })).toBeVisible();

@@ -6,8 +6,9 @@ Branch: feat/shish-mvp.
 
 | Stage | State | Evidence |
 |---|---|---|
-| S0 | Complete | S0.md; commit recorded at next checkpoint |
-| S1 | In progress | PostgreSQL + ORM schema/migrations next |
-| S2–S11 | Not started | No acceptance claimed |
+| S0 | Complete | S0.md; 5539e81 |
+| S1 | Complete | S1.md; commit recorded at next checkpoint |
+| S2 | In progress | Content fixtures and public DTOs |
+| S3–S11 | Not started | No acceptance claimed |
 
-Next: S1 ORM ADR, local isolated PostgreSQL, reproducible migrations/schema/seed, health endpoint and transaction rollback integration test. No production services or real payments enabled.
+Next: S2 metadata slots, three versioned synthetic German fixtures, public DTO/API confidentiality tests. No Production services or real payments enabled.
