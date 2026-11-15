@@ -8,8 +8,8 @@ import {
   Alert,
   Tooltip,
 } from "@heroui/react";
-import { RestartIcon } from "@solar-icons/react/linear/restart";
-import { StarsIcon } from "@solar-icons/react/bold/stars";
+import { RotateCcw as RestartIcon } from "lucide-react";
+import { Sparkles as StarsIcon } from "lucide-react";
 import {
   Volume2,
   Mic,

@@ -2,9 +2,9 @@
 
 import React, { useMemo } from "react";
 import { Button, Chip } from "@heroui/react";
-import { RestartIcon } from "@solar-icons/react/linear/restart";
-import { CheckCircleIcon } from "@solar-icons/react/bold/check-circle";
-import { StarsIcon } from "@solar-icons/react/bold/stars";
+import { RotateCcw as RestartIcon } from "lucide-react";
+import { CircleCheck as CheckCircleIcon } from "lucide-react";
+import { Sparkles as StarsIcon } from "lucide-react";
 import { Volume2, AlertCircle } from "lucide-react";
 import { BaseCard } from "@/components/molecules/base-card";
 import {

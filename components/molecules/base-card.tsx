@@ -2,9 +2,9 @@
 
 import React, { ReactNode } from "react";
 import { Card, Button, ProgressBar } from "@heroui/react";
-import { CheckCircleIcon } from "@solar-icons/react/bold/check-circle";
-import { AltArrowLeftIcon } from "@solar-icons/react/linear/alt-arrow-left";
-import { LockIcon } from "@solar-icons/react/bold/lock";
+import { CircleCheck as CheckCircleIcon } from "lucide-react";
+import { ArrowLeft as AltArrowLeftIcon } from "lucide-react";
+import { Lock as LockIcon } from "lucide-react";
 
 export interface BaseCardProps {
   /** برچسب متنی بالای کارت یا نوع درس */

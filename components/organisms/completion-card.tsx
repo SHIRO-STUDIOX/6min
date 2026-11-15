@@ -2,11 +2,11 @@
 
 import React, { useMemo } from "react";
 import { Button, Chip, Spinner } from "@heroui/react";
-import { RestartIcon } from "@solar-icons/react/linear/restart";
-import { CupFirstIcon } from "@solar-icons/react/bold/cup-first";
-import { FireIcon } from "@solar-icons/react/bold/fire";
-import { StarsIcon } from "@solar-icons/react/bold/stars";
-import { AltArrowLeftIcon } from "@solar-icons/react/linear/alt-arrow-left";
+import { RotateCcw as RestartIcon } from "lucide-react";
+import { Trophy as CupFirstIcon } from "lucide-react";
+import { Flame as FireIcon } from "lucide-react";
+import { Sparkles as StarsIcon } from "lucide-react";
+import { ArrowLeft as AltArrowLeftIcon } from "lucide-react";
 import {
   Clock,
   Target,

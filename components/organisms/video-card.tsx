@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@heroui/react";
-import { PlayIcon } from "@solar-icons/react/bold/play";
-import { RestartIcon } from "@solar-icons/react/linear/restart";
-import { LockIcon } from "@solar-icons/react/bold/lock";
-import { StarsIcon } from "@solar-icons/react/bold/stars";
+import { Play as PlayIcon } from "lucide-react";
+import { RotateCcw as RestartIcon } from "lucide-react";
+import { Lock as LockIcon } from "lucide-react";
+import { Sparkles as StarsIcon } from "lucide-react";
 import { BaseCard } from "@/components/molecules/base-card";
 
 export interface VideoCardProps {

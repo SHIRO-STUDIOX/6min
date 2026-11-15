@@ -1,0 +1,9 @@
+# 6min Telegram Admin OTP Service Dependencies
+aiogram>=3.14.0
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+pydantic>=2.8.0
+pydantic-settings>=2.4.0
+python-dotenv>=1.0.0
+httpx>=0.27.0
+aiohttp>=3.10.0
