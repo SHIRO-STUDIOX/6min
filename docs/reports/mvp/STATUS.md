@@ -25,3 +25,4 @@ Complete: see FINAL.md, QC_STEPS.md and RELEASE_GATES.md. Owner review next; no 
 
 - Windows startup diagnostics/portable Node migration invocation: FIX-windows-local-setup.md; 53f2963.
 - Owner-selected local SQLite + PostgreSQL Production, ordered start.ps1 and both-driver parity: LOCAL-SQLITE.md; commit introducing that report. Feature branch is published for local pull; no main/dev merge or deployment.
+- Windows classroom/roadmap loading: FIX-local-start-loading.md; localhost/Webpack launcher, IPv4/IPv6 preflight and real start.ps1 browser regression verified locally on 2026-11-16. Owner authorized add/commit/push to feat/shish-mvp; introducing commit contains the report. No main/dev merge or deployment.

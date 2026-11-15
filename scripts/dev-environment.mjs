@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 // Isolated local setup only. Never reset databases, remove volumes or print secrets.
 import { randomBytes } from "node:crypto";
 import {

@@ -12,6 +12,8 @@ git pull --ff-only
 
 فایل به ترتیب نسخهٔ Node و تنظیمات را بررسی می‌کند، در صورت نیاز `npm ci` می‌زند، فایل SQLite را آماده می‌کند، migration و seed تکرارپذیر را اجرا می‌کند و Next.js را روی `http://localhost:3000` بالا می‌آورد. اولین نصب بسته‌ها ممکن است زمان ببرد. برای توقف `Ctrl+C` بزن؛ دیتابیس باقی می‌ماند. اگر پورت اشغال باشد، سرویس دیگری را نمی‌بندد و پیام مشخص می‌دهد.
 
+آدرس چاپ‌شدهٔ `localhost` را باز کن. لانچر عمداً از Webpack استفاده می‌کند؛ حالت Turbopack در محیط لوکال ویندوز با رفرش پی‌درپی و پیام `HMR hash mismatch` مانع تکمیل بارگذاری می‌شد. آدرس سرور و مرورگر نیز هر دو `localhost` هستند تا درخواست ساخت نشست مهمان با خطای `ORIGIN_REQUIRED` رد نشود. کنترل امنیتی Origin همچنان برقرار است.
+
 ```powershell
 .\start.ps1 -Port 3001
 .\start.ps1 -SetupOnly
@@ -46,7 +48,10 @@ node --import ./scripts/load-local-sqlite.mjs node_modules/next/dist/bin/next bu
 npm run typecheck
 npx playwright install chromium
 npm run test:e2e:sqlite
+npm run test:local-start
 ```
+
+تست `test:local-start` خود `start.ps1` را روی پورت ۳۱۰۷ اجرا می‌کند و با نشست تازهٔ مهمان، کارت‌های کلاس، ۶۰ ردیف مسیر، پروفایل و پایداری صفحه را در مرورگر بررسی می‌کند. PowerShell (`powershell.exe` در ویندوز یا `pwsh` در لینوکس) لازم است. این تست همان پروفایل و دیتابیس توسعهٔ لانچر را به‌کار می‌برد؛ داده‌ای را پاک یا reset نمی‌کند و فقط سابقهٔ نشست آزمایشی مهمان اضافه می‌شود. برای اجرای آن سرور توسعهٔ دیگری در همین checkout باز نباشد. تست‌های قبلی همچنان جداگانه روی `next start` اجرا می‌شوند.
 
 ## Production و PostgreSQL
 

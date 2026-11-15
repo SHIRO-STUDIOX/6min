@@ -10,8 +10,11 @@ const child = spawn(
   [
     resolve("node_modules/next/dist/bin/next"),
     "dev",
+    // Turbopack currently loops on HMR restarts in the local Windows runtime.
+    "--webpack",
     "--hostname",
-    "127.0.0.1",
+    // NextRequest normalizes loopback IPs to localhost; keep browser Origin equal.
+    "localhost",
     "--port",
     String(port),
   ],

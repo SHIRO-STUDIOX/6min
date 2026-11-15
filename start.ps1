@@ -23,8 +23,21 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Local environment preflight failed; see the message above.' }
 
     if (!$SetupOnly) {
-        $Listener = New-Object System.Net.Sockets.TcpListener([System.Net.IPAddress]::Loopback, $Port)
-        try { $Listener.Start() } catch { throw "Port $Port is already in use. Stop your previous dev server or use .\start.ps1 -Port 3001" } finally { $Listener.Stop() }
+        # localhost can resolve to IPv4 or IPv6. Check both before setup writes.
+        $LoopbackAddresses = @([System.Net.IPAddress]::Loopback)
+        if ([System.Net.Sockets.Socket]::OSSupportsIPv6) { $LoopbackAddresses += [System.Net.IPAddress]::IPv6Loopback }
+        $Listeners = @()
+        try {
+            foreach ($Address in $LoopbackAddresses) {
+                $Listener = New-Object System.Net.Sockets.TcpListener($Address, $Port)
+                $Listeners += $Listener
+                $Listener.Start()
+            }
+        } catch {
+            throw "Port $Port is already in use. Stop your previous dev server or use .\start.ps1 -Port 3001"
+        } finally {
+            foreach ($Listener in $Listeners) { $Listener.Stop() }
+        }
     }
 
     Write-Host '[2/5] Checking installed dependencies...'
@@ -49,7 +62,7 @@ try {
     if ($SetupOnly) {
         Write-Host 'Setup complete. Run .\start.ps1 to start the application.'
     } else {
-        Write-Host "[5/5] Starting SHISH at http://localhost:$Port (Ctrl+C to stop)..."
+        Write-Host "[5/5] Starting SHISH at http://localhost:$Port (Webpack; Ctrl+C to stop)..."
         $AppProcess = Start-Process -FilePath $Node -ArgumentList @('scripts/run-local-next.mjs', [string]$Port) -WorkingDirectory $PSScriptRoot -NoNewWindow -PassThru
         while (!$AppProcess.HasExited) { Start-Sleep -Milliseconds 200; $AppProcess.Refresh() }
         $AppProcess.WaitForExit()

@@ -21,7 +21,8 @@
     "security:check": "node scripts/security-check.mjs",
     "dev:sqlite": "node scripts/local-sqlite-setup.mjs",
     "test:integration:sqlite": "node --import ./scripts/load-local-sqlite.mjs --import tsx scripts/test-integration.ts --sqlite",
-    "test:e2e:sqlite": "node --import ./scripts/load-local-sqlite.mjs node_modules/@playwright/test/cli.js test"
+    "test:e2e:sqlite": "node --import ./scripts/load-local-sqlite.mjs node_modules/@playwright/test/cli.js test",
+    "test:local-start": "playwright test --config playwright.local.config.ts"
   },
   "dependencies": {
     "@heroui/react": "3.2.4",
