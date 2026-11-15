@@ -1,8 +1,18 @@
 # Local MVP development
 
-Use the existing checkout, Node24+, npm and local Docker/PostgreSQL17. Preserve local files. Do not create worktrees, reset data, merge, deploy, or contact live providers during setup. See docs/MVP_EXECUTION_POLICY.md and stage evidence docs/reports/mvp/.
+Use the existing checkout, Node24+ and npm. Windows start.ps1 defaults to embedded SQLite; PostgreSQL remains the Production backend. Docker/PostgreSQL installation is optional for the existing PostgreSQL development workflow. Preserve local files. Do not create worktrees, reset data, merge, deploy, or contact live providers during setup. See docs/MVP_EXECUTION_POLICY.md and stage evidence docs/reports/mvp/.
 
-## Install and initialize
+## Default Windows start (SQLite, no external services)
+
+Run `./start.ps1` from the checkout. It checks Node24+, installs dependencies only when the lockfile changed or modules are missing, applies SQLite migrations, loads demo lessons and starts Next on3000. Use `-Port 3001`, `-SetupOnly`, or `-RefreshDependencies` when needed. See [LOCAL_START.md](LOCAL_START.md) for PowerShell policy and first-run details.
+
+SQLite data stays in ignored .local-data/shish-dev.sqlite with a separate shish-test.sqlite and .env.sqlite.local. Existing .env/.env.local and PostgreSQL data are retained. There is no automatic cross-database progress transfer. Test a new mode in a private browser window or sign in again when changing database backends.
+
+Cross-platform equivalent: `npm ci`, `npm run dev:sqlite`, then `node --import ./scripts/load-local-sqlite.mjs node_modules/next/dist/bin/next dev -p 3000`. Use the preloader; passing --env-file directly to next dev fails when Next forwards that option into worker NODE_OPTIONS. The preloader only exports validated local setup keys and refuses SHISH_ENV=production. Local Next build/preview NODE_ENV=production is separate from a Production deployment.
+
+SQLite checks: `npm test`, `npm run test:integration:sqlite`, `node --import ./scripts/load-local-sqlite.mjs node_modules/next/dist/bin/next build`, `npm run typecheck`, `npm run test:e2e:sqlite`. CI includes Ubuntu/Windows SQLite jobs plus the existing PostgreSQL job. Local evidence is not remote CI success.
+
+## Optional PostgreSQL install and initialization
 
 From repository root:
 

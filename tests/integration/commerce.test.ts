@@ -41,7 +41,7 @@ async function event(subject: Subject, id: string): Promise<VerifiedPayment> {
   );
   return {
     purchaseId: id,
-    providerRef: rows[0].provider_ref,
+    providerRef: String(rows[0].provider_ref),
     externalPaymentId: randomUUID(),
     payerReference: subject.id,
     amountMinor: demoProduct.amountMinor,

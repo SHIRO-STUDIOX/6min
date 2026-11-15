@@ -18,7 +18,10 @@
     "db:seed": "node --env-file-if-exists=.env.local --import tsx scripts/db-seed.ts",
     "dev:setup": "node scripts/dev-environment.mjs",
     "backup:drill": "node --env-file-if-exists=.env.local --import tsx scripts/backup-restore-drill.ts",
-    "security:check": "node scripts/security-check.mjs"
+    "security:check": "node scripts/security-check.mjs",
+    "dev:sqlite": "node scripts/local-sqlite-setup.mjs",
+    "test:integration:sqlite": "node --import ./scripts/load-local-sqlite.mjs --import tsx scripts/test-integration.ts --sqlite",
+    "test:e2e:sqlite": "node --import ./scripts/load-local-sqlite.mjs node_modules/@playwright/test/cli.js test"
   },
   "dependencies": {
     "@heroui/react": "3.2.4",

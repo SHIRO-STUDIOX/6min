@@ -1,0 +1,45 @@
+name: SQLite local parity
+on: [push, pull_request]
+jobs:
+  sqlite:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      NEXT_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Ordered PowerShell local setup without database services
+        shell: pwsh
+        run: ./start.ps1 -SetupOnly
+      - run: npm test
+      - run: npm run test:integration:sqlite
+      - run: npm run lint
+      - run: node --import ./scripts/load-local-sqlite.mjs node_modules/next/dist/bin/next build
+      - name: Windows launcher readiness
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $app = Start-Process -FilePath (Get-Command pwsh).Source -ArgumentList @('-NoProfile', '-File', './start.ps1', '-Port', '3107') -NoNewWindow -PassThru
+          try {
+            $ready = $false
+            for ($attempt = 0; $attempt -lt 60; $attempt++) {
+              if ($app.HasExited) { throw 'Launcher exited before readiness' }
+              try {
+                $health = Invoke-RestMethod 'http://127.0.0.1:3107/api/v1/health'
+                if ($health.data.ready) { $ready = $true; break }
+              } catch { Start-Sleep -Milliseconds 500 }
+            }
+            if (!$ready) { throw 'Local readiness timeout' }
+            $catalog = Invoke-RestMethod 'http://127.0.0.1:3107/api/v1/catalog'
+            if ($catalog.data.lessons.Count -ne 60) { throw 'Wrong local catalog' }
+          } finally {
+            if (!$app.HasExited) { taskkill.exe /PID $app.Id /T /F | Out-Null }
+          }
+      - run: npm run typecheck
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e:sqlite

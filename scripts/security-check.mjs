@@ -1,28 +1,32 @@
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { parseEnv } from "node:util";
-const config = {
-  ...(existsSync(".env.local")
-    ? parseEnv(readFileSync(".env.local", "utf8"))
-    : {}),
-  ...process.env,
-};
+const configs = [
+  ...[".env", ".env.local", ".env.sqlite.local"]
+    .filter(existsSync)
+    .map((file) => parseEnv(readFileSync(file, "utf8"))),
+  process.env,
+];
 const secrets = [];
-for (const [name, value] of Object.entries(config)) {
-  if (!value) continue;
-  if (/DATABASE_URL$/.test(name)) {
-    try {
-      const parsed = new URL(value);
-      secrets.push(value, decodeURIComponent(parsed.password));
-    } catch {}
-  } else if (
-    /^(SHISH_MOCK_PAYMENT_SECRET|TELEGRAM_BOT_TOKEN|TELEGRAM_SERVICE_API_KEY)$/.test(
-      name,
+for (const config of configs)
+  for (const [name, value] of Object.entries(config)) {
+    if (!value) continue;
+    if (/DATABASE_URL$/.test(name)) {
+      try {
+        const parsed = new URL(value);
+        if (parsed.password)
+          secrets.push(value, decodeURIComponent(parsed.password));
+      } catch {}
+    } else if (
+      /^(SHISH_MOCK_PAYMENT_SECRET|TELEGRAM_BOT_TOKEN|TELEGRAM_SERVICE_API_KEY)$/.test(
+        name,
+      )
     )
-  )
-    secrets.push(value);
-}
-const protectedValues = secrets.filter((value) => value.length >= 12);
+      secrets.push(value);
+  }
+const protectedValues = [
+  ...new Set(secrets.filter((value) => value.length >= 12)),
+];
 let scanned = 0;
 function inspect(file) {
   const size = statSync(file).size;

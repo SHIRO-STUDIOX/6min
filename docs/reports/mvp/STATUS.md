@@ -20,3 +20,8 @@ Branch: feat/shish-mvp.
 | S11 | Complete (functional development scope) | S11.md; final report commit |
 
 Complete: see FINAL.md, QC_STEPS.md and RELEASE_GATES.md. Owner review next; no live provider, push, merge or deployment performed/authorized.
+
+## Post-S11 follow-ups
+
+- Windows startup diagnostics/portable Node migration invocation: FIX-windows-local-setup.md; 53f2963.
+- Owner-selected local SQLite + PostgreSQL Production, ordered start.ps1 and both-driver parity: LOCAL-SQLITE.md; commit introducing that report. Feature branch is published for local pull; no main/dev merge or deployment.

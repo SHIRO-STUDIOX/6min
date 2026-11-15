@@ -15,6 +15,13 @@ export default defineConfig({
     url: "http://localhost:6106/sandbox",
     reuseExistingServer: false,
     timeout: 120000,
-    env: { NEXT_TELEMETRY_DISABLED: "1", DATABASE_URL: process.env.TEST_DATABASE_URL ?? "", SHISH_ENV: "test", SHISH_DEMO_MODE: "1", SHISH_SMS_PROVIDER: "mock" },
+    env: {
+      NEXT_TELEMETRY_DISABLED: "1",
+      DATABASE_URL: process.env.TEST_DATABASE_URL ?? "",
+      SHISH_DB_DRIVER: process.env.SHISH_DB_DRIVER ?? "postgres",
+      SHISH_ENV: "test",
+      SHISH_DEMO_MODE: "1",
+      SHISH_SMS_PROVIDER: "mock",
+    },
   },
 });

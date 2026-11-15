@@ -10,7 +10,7 @@ Functional development MVP and Production launch are separate decisions. No depl
 | Payments | Signed local TEST_ONLY simulator, owner/idempotency/amount/ref checks, unique grant | Approved provider/price/currency, vendor sandbox proof, TLS callback, outage/retry/reconciliation and refund policy |
 | Assets | Private local dev avatar raster storage, own-only reads, safe failure | Approved private durable object storage, retention/backup, malware/native decoding patch process |
 | Database | 13 additive checked migrations; isolated test restore digest comparison | Least privilege app/migration roles, encrypted scheduled backups/PITR, RPO/RTO, actual restore drill |
-| Hosting | Node24/PostgreSQL17 locally; reproducible npm lock; no public deployment | Owner hosting/domain/network/TLS/CSP/HSTS/secrets configuration; callback accessibility; separate test/prod data |
+| Hosting | Node24 with local SQLite and PostgreSQL17 parity; Production PostgreSQL required; reproducible npm lock; no public deployment | Owner hosting/domain/network/TLS/CSP/HSTS/secrets configuration; callback accessibility; separate test/prod data |
 | Privacy | Bounded inputs, opaque cookies, no raw mic audio stored, error logs exclude bodies/PII | Privacy/consent/retention/deletion policies, avatar/guest archive expiry, region and operator access |
 | Monitoring | Nonsecret health readiness and requestId/code/status API failure logs | Production log/metric sink, actionable alerts, incident/oncall ownership and budget/reconciliation alerts |
 | Security | Local ownership/CSRF/strict bodies/replay/rate limits/provider failclosed tested; dependency audit | Actual hosting security verification, secret rotation process, independent review; no penetration-test claim |

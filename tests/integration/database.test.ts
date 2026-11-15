@@ -6,7 +6,7 @@ afterAll(async () => {
   await pool.end();
 });
 
-describe("S1 real PostgreSQL invariants", () => {
+describe("S1 database persistence invariants", () => {
   it("has 60 slots and keeps 57 unfinished lessons unpublished", async () => {
     const result = await pool.query(
       "SELECT count(*)::int AS total, count(*) FILTER (WHERE published)::int AS published FROM lessons WHERE course_id='shish-de-60'",
