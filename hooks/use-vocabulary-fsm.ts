@@ -9,6 +9,7 @@ export type VocabularyCardState =
   | "IDLE"
   | "SOURCE_SELECTED"
   | "EVALUATING"
+  | "ANSWER_RECORDED"
   | "MATCH_SUCCESS"
   | "MISMATCH_ERROR"
   | "COMPLETED";
@@ -60,7 +61,11 @@ export interface VocabularyResult {
   accuracyPercentage: number;
 }
 
+export type VocabularySelection = { sourceId: string; targetId: string };
+
 export interface UseVocabularyFsmOptions {
+  evaluationMode?: "local" | "deferred";
+  onDeferredComplete?: (answers: VocabularySelection[]) => void;
   pairs: VocabularyPair[];
   autoShuffleTarget?: boolean;
   successFeedbackMs?: number;
@@ -87,6 +92,8 @@ function shuffleArray<T>(array: T[]): T[] {
  */
 export function useVocabularyFsm({
   pairs,
+  evaluationMode = "local",
+  onDeferredComplete,
   autoShuffleTarget = true,
   successFeedbackMs = 650,
   errorFeedbackMs = 850,
@@ -98,6 +105,7 @@ export function useVocabularyFsm({
   const [cardState, setCardState] = useState<VocabularyCardState>("IDLE");
   const [selectedSourceId, setSelectedSourceId] = useState<string | null>(null);
   const [selectedTargetId, setSelectedTargetId] = useState<string | null>(null);
+  const [deferredAnswers, setDeferredAnswers] = useState<VocabularySelection[]>([]);
   const [matchedIds, setMatchedIds] = useState<Set<string>>(new Set());
   const [isLocked, setIsLocked] = useState<boolean>(false);
   const [mistakeCount, setMistakeCount] = useState<number>(0);
@@ -162,6 +170,7 @@ export function useVocabularyFsm({
     setSelectedSourceId(null);
     setSelectedTargetId(null);
     setMatchedIds(new Set());
+    setDeferredAnswers([]);
     setIsLocked(false);
     setMistakeCount(0);
     setMistakenPairIds(new Set());
@@ -217,6 +226,22 @@ export function useVocabularyFsm({
         return;
       }
 
+      if (evaluationMode === "deferred") {
+        const answers = [...deferredAnswers, { sourceId, targetId }];
+        setDeferredAnswers(answers);
+        setMatchedIds(new Set([...Array.from(matchedIds), srcItem.pairId]));
+        updateState("ANSWER_RECORDED");
+        transitionTimerRef.current = setTimeout(() => {
+          setSelectedSourceId(null);
+          setSelectedTargetId(null);
+          setIsLocked(false);
+          if (answers.length === pairs.length) {
+            updateState("COMPLETED");
+            onDeferredComplete?.(answers);
+          } else updateState("IDLE");
+        }, successFeedbackMs);
+        return;
+      }
       const isMatch = srcItem.pairId === tgtItem.pairId;
 
       if (isMatch) {
@@ -282,6 +307,9 @@ export function useVocabularyFsm({
       sourceItems,
       targetItems,
       matchedIds,
+      evaluationMode,
+      deferredAnswers,
+      onDeferredComplete,
       pairs,
       mistakeCount,
       mistakenPairIds,
@@ -306,7 +334,10 @@ export function useVocabularyFsm({
       if (!item) return;
 
       // بررسی اینکه آیا جفت قبلاً مچ شده است
-      if (matchedIds.has(item.pairId)) return;
+      if (evaluationMode === "deferred") {
+        if (column === "source" && matchedIds.has(item.pairId)) return;
+        if (column === "target" && deferredAnswers.some((answer) => answer.targetId === item.id)) return;
+      } else if (matchedIds.has(item.pairId)) return;
 
       // پخش صدای آیتم در صورت وجود
       if (item.audioSrc) {
@@ -350,6 +381,8 @@ export function useVocabularyFsm({
     },
     [
       isLocked,
+      evaluationMode,
+      deferredAnswers,
       cardState,
       sourceItems,
       targetItems,
@@ -379,6 +412,7 @@ export function useVocabularyFsm({
     setSelectedSourceId(null);
     setSelectedTargetId(null);
     setMatchedIds(new Set());
+    setDeferredAnswers([]);
     setIsLocked(false);
     setMistakeCount(0);
     setMistakenPairIds(new Set());
@@ -387,6 +421,7 @@ export function useVocabularyFsm({
 
   return {
     cardState,
+    deferredAnswers,
     sourceItems,
     targetItems,
     selectedSourceId,

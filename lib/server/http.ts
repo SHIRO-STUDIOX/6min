@@ -16,7 +16,7 @@ export async function apiResponse(action: () => Promise<unknown>) {
           code: known ? error.code : "SERVICE_UNAVAILABLE",
           message: known ? error.code : "Service temporarily unavailable",
           requestId,
-          retryable: !known,
+          retryable: !known || error.status >= 500,
         },
       },
       {
