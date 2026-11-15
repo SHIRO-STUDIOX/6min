@@ -52,6 +52,18 @@ function storageRoot() {
 export async function replaceAvatar(userId: string, bytes: Buffer) {
   const root = storageRoot();
   if (bytes.length > 2097152) throw new ContentError("AVATAR_TOO_LARGE", 413);
+  const png = bytes
+    .subarray(0, 8)
+    .equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
+  const jpeg =
+    bytes.length >= 3 &&
+    bytes[0] === 255 &&
+    bytes[1] === 216 &&
+    bytes[2] === 255;
+  const webp =
+    bytes.subarray(0, 4).toString("ascii") === "RIFF" &&
+    bytes.subarray(8, 12).toString("ascii") === "WEBP";
+  if (!png && !jpeg && !webp) throw new ContentError("INVALID_AVATAR", 422);
   let encoded: Buffer;
   try {
     const image = sharp(bytes, { limitInputPixels: 16000000, animated: false });

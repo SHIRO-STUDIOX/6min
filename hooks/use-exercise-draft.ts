@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { api } from "@/lib/client/api";
+import { scopedApi } from "@/lib/client/api";
 import { loadGuestDraft, saveGuestDraft } from "@/lib/client/guest-store";
 import type { Learner } from "@/lib/contracts/experience";
 
@@ -24,6 +24,7 @@ export function useExerciseDraft(
   const tail = useRef<Promise<void>>(Promise.resolve());
   const scope = model?.scope ?? "sandbox";
   const account = model?.kind === "user";
+  const api = scopedApi(scope);
   useEffect(() => {
     if (!model) return;
     let cancelled = false;

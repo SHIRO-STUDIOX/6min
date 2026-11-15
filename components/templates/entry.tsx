@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Card } from "@heroui/react";
+import { resumePath } from "@/lib/client/resume-path";
 import { loadLearner } from "@/lib/client/learner";
 
 export function Entry() {
@@ -12,9 +13,7 @@ export function Entry() {
     void loadLearner()
       .then((model) => {
         if (model.progress.lastActivity)
-          router.replace(
-            `/classroom/${encodeURIComponent(model.progress.lastActivity.lesson_id)}`,
-          );
+          router.replace(resumePath(model.progress));
         else setLoading(false);
       })
       .catch(() => setLoading(false));

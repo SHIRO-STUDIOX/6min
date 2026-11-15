@@ -11,7 +11,7 @@ import {
   vocabularyPairs,
   fullCompletion,
 } from "@/lib/client/exercise-adapter";
-import { api } from "@/lib/client/api";
+import { scopedApi } from "@/lib/client/api";
 import { errorMessage } from "@/lib/client/messages";
 import type { Learner } from "@/lib/contracts/experience";
 import type { PublicStage } from "@/lib/contracts/content";
@@ -36,7 +36,7 @@ const matchingDraft = z.object({
   selections: z.array(z.object({ sourceId: z.string(), targetId: z.string() })),
 });
 const grammarDraft = z.object({
-  answers: z.record(z.array(z.string())),
+  answers: z.record(z.string(), z.array(z.string())),
   currentIndex: z.number().int().nonnegative(),
   selectedTokenIds: z.array(z.string()),
 });
@@ -85,12 +85,15 @@ function Submission({
   onResult,
   reset,
   preview,
+  subjectScope,
 }: {
   body: FullAttemptInput | null;
   onResult?: Props["onResult"];
   reset: () => void;
   preview: boolean;
+  subjectScope?: string;
 }) {
+  const api = scopedApi(subjectScope);
   const key = useRef<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -232,6 +235,7 @@ function Matching({
         نمره‌دهی نشده است.
       </p>
       <Submission
+        subjectScope={model?.scope}
         preview={!model}
         body={
           complete
@@ -351,6 +355,7 @@ function Grammar({
         </Button>
       )}
       <Submission
+        subjectScope={model?.scope}
         preview={!model}
         body={
           complete

@@ -1,4 +1,5 @@
 import { randomInt, randomUUID } from "node:crypto";
+import sharp from "sharp";
 import { expect, test } from "@playwright/test";
 test("S9 My Path is reversed, locks expand in place, jump only scrolls and restores position", async ({
   page,
@@ -66,10 +67,11 @@ test("S9 profile persists name and private avatar; malformed upload preserves it
   await expect(page.getByLabel("نام نمایشی", { exact: true })).toHaveValue(
     "نام پایدار",
   );
-  const png = Buffer.from(
-    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+j5hQAAAAASUVORK5CYII=",
-    "base64",
-  );
+  const png = await sharp({
+    create: { width: 8, height: 8, channels: 3, background: "blue" },
+  })
+    .png()
+    .toBuffer();
   await page
     .locator('input[type="file"]')
     .setInputFiles({ name: "tiny.png", mimeType: "image/png", buffer: png });

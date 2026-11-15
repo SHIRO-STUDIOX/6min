@@ -20,7 +20,7 @@ import {
   User,
   CircleAlert,
 } from "lucide-react";
-import { api } from "@/lib/client/api";
+import { scopedApi } from "@/lib/client/api";
 import { errorMessage } from "@/lib/client/messages";
 import type { Learner } from "@/lib/contracts/experience";
 
@@ -37,6 +37,7 @@ export function AppFrame({
   lessonId?: string | null;
   stageId?: string | null;
 }) {
+  const api = scopedApi(model?.scope);
   const router = useRouter();
   const pathname = usePathname();
   const { resolvedTheme, setTheme } = useTheme();
@@ -50,6 +51,10 @@ export function AppFrame({
   const [reportStatus, setReportStatus] = useState("");
   const positions = useRef(new WeakMap<HTMLElement, number>());
   useEffect(() => {
+    const identityChanged = (event: StorageEvent) => {
+      if (event.key === "shish:identity-change") window.location.reload();
+    };
+    window.addEventListener("storage", identityChanged);
     const scrolled = (event: Event) => {
       const target = event.target as HTMLElement;
       if (!target?.hasAttribute?.("data-app-scroll")) return;
@@ -69,6 +74,7 @@ export function AppFrame({
     document.addEventListener("scroll", scrolled, true);
     window.visualViewport?.addEventListener("resize", resize);
     return () => {
+      window.removeEventListener("storage", identityChanged);
       document.removeEventListener("scroll", scrolled, true);
       window.visualViewport?.removeEventListener("resize", resize);
     };

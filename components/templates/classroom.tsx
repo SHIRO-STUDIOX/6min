@@ -48,6 +48,10 @@ export function Classroom({
         setModel(learner);
         const content = await api<LessonDTO>(
           `/lessons/${encodeURIComponent(lessonId)}`,
+          "GET",
+          undefined,
+          undefined,
+          learner.scope,
         );
         setLesson(content);
         setError("");
@@ -85,14 +89,20 @@ export function Classroom({
       if (!lesson) return;
       const selected = lesson.stages[selectedIndex ?? activeIndex.current];
       if (!selected) return;
-      void api("/context", "POST", {
-        lessonId,
-        revisionId: lesson.currentRevisionId,
-        stageId: selected.id,
-        kind,
-      }).catch(() => {});
+      void api(
+        "/context",
+        "POST",
+        {
+          lessonId,
+          revisionId: lesson.currentRevisionId,
+          stageId: selected.id,
+          kind,
+        },
+        undefined,
+        model?.scope,
+      ).catch(() => {});
     },
-    [lesson, lessonId],
+    [lesson, lessonId, model?.scope],
   );
   const select = (next: number) => {
     if (!lesson) return;
@@ -102,7 +112,7 @@ export function Classroom({
     window.history.replaceState(
       window.history.state,
       "",
-      `/classroom/${encodeURIComponent(lessonId)}?stage=${encodeURIComponent(lesson.stages[clamped].id)}&restore=1`,
+      `/classroom/${encodeURIComponent(lessonId)}?stage=${encodeURIComponent(lesson.stages[clamped].id)}&restore=1${reviewReturn ? `&returnTo=${encodeURIComponent(reviewReturn)}` : ""}`,
     );
   };
   const result = (receipt: AttemptReceipt) => {
@@ -179,7 +189,7 @@ export function Classroom({
               <Button
                 onPress={() =>
                   router.push(
-                    `/auth?returnTo=${encodeURIComponent(`/classroom/${lessonId}${stage ? `?stage=${stage.id}` : ""}`)}`,
+                    `/auth?returnTo=${encodeURIComponent(`/classroom/${lessonId}${stage?.id || initialStageId ? `?stage=${encodeURIComponent(stage?.id ?? initialStageId!)}` : ""}`)}`,
                   )
                 }
               >
@@ -332,6 +342,7 @@ export function Classroom({
                                 durationMs={lesson.video.durationMs}
                                 demoOnly={lesson.demoOnly}
                                 persist
+                                subjectScope={model?.scope}
                                 onInteract={() => context("interaction")}
                                 onCredit={() => void load()}
                               />

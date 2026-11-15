@@ -10,6 +10,14 @@ export async function apiResponse(action: () => Promise<unknown>) {
     );
   } catch (error) {
     const known = error instanceof ContentError;
+    console.warn(
+      JSON.stringify({
+        event: "api_failure",
+        requestId,
+        code: known ? error.code : "SERVICE_UNAVAILABLE",
+        status: known ? error.status : 503,
+      }),
+    );
     return Response.json(
       {
         error: {

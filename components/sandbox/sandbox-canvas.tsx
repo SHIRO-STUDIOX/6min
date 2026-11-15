@@ -136,7 +136,9 @@ export function SandboxCanvas() {
   } = useSandbox();
 
   const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
+  const [themeReady, setThemeReady] = useState(false);
+  useEffect(() => setThemeReady(true), []);
+  const isDark = themeReady && resolvedTheme === "dark";
 
   // Resizing and Inspection refs
   const [isResizing, setIsResizing] = useState(false);

@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@heroui/react";
 import { AppFrame } from "./app-frame";
 import { useLearner } from "@/hooks/use-learner";
-import { api } from "@/lib/client/api";
+import { scopedApi } from "@/lib/client/api";
 import { errorMessage } from "@/lib/client/messages";
 type Product = {
   id: string;
@@ -20,6 +20,7 @@ type Purchase = {
   testOnly: boolean;
   continuePath: string;
   intendedLesson: {
+    id: string;
     access: { canStart: boolean; reason: string | null };
   } | null;
 };
@@ -32,6 +33,7 @@ const statusLabels = {
 };
 export function Checkout({ lessonId }: { lessonId?: string }) {
   const { model } = useLearner();
+  const api = scopedApi(model?.scope);
   const router = useRouter();
   const [product, setProduct] = useState<Product | null>(null);
   const [error, setError] = useState("");
@@ -105,6 +107,7 @@ export function Checkout({ lessonId }: { lessonId?: string }) {
 }
 export function PaymentMock({ id }: { id: string }) {
   const { model } = useLearner();
+  const api = scopedApi(model?.scope);
   const router = useRouter();
   const [purchase, setPurchase] = useState<Purchase | null>(null);
   const [error, setError] = useState("");
@@ -175,6 +178,7 @@ export function PaymentMock({ id }: { id: string }) {
 }
 export function PaymentReturn({ id }: { id: string }) {
   const { model, reload } = useLearner();
+  const api = scopedApi(model?.scope);
   const router = useRouter();
   const [purchase, setPurchase] = useState<Purchase | null>(null);
   const [error, setError] = useState("");
@@ -250,7 +254,13 @@ export function PaymentReturn({ id }: { id: string }) {
             {["failed", "cancelled", "expired"].includes(purchase.status) && (
               <>
                 <p>پیشرفت یادگیری محفوظ است.</p>
-                <Button onPress={() => router.push("/checkout")}>
+                <Button
+                  onPress={() =>
+                    router.push(
+                      `/checkout${purchase.intendedLesson ? `?lesson=${purchase.intendedLesson.id}` : ""}`,
+                    )
+                  }
+                >
                   تلاش دوباره برای پرداخت آزمایشی
                 </Button>
               </>

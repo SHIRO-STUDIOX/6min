@@ -16,7 +16,7 @@ Branch: feat/shish-mvp.
 | S7 | Complete (mock provider) | S7.md; 8cc7f07 |
 | S8 | Complete | S8.md; 7e288a6 |
 | S9 | Complete (local private assets) | S9.md; 018090d |
-| S10 | Complete (TEST_ONLY simulator) | S10.md; commit recorded at next checkpoint |
-| S11 | In progress | Full regression, restore and runtime hardening |
+| S10 | Complete (TEST_ONLY simulator) | S10.md; 5efd536 |
+| S11 | Complete (functional development scope) | S11.md; final report commit |
 
-Next: S11 final verification, local backup/restore drill, runtime instructions and release gates. No live provider or deployment authorized.
+Complete: see FINAL.md, QC_STEPS.md and RELEASE_GATES.md. Owner review next; no live provider, push, merge or deployment performed/authorized.

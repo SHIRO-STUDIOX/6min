@@ -87,6 +87,13 @@ const reportSchema = z
 export async function reportProblem(subject: Subject, input: unknown) {
   const parsed = reportSchema.safeParse(input);
   if (!parsed.success) throw new ContentError("INVALID_REPORT", 422);
+  const { lessonId, stageId } = parsed.data;
+  if (stageId && !lessonId) throw new ContentError("INVALID_REPORT", 422);
+  if (lessonId) {
+    const lesson = await lessonPublic(lessonId, subject);
+    if (stageId && !lesson.stages.some((s) => s.id === stageId))
+      throw new ContentError("INVALID_REPORT", 422);
+  }
   const id = randomUUID();
   await db.execute(
     sql`INSERT INTO support_reports(id,subject_id,message,lesson_id,stage_id) VALUES (${id},${subject.id},${parsed.data.message},${parsed.data.lessonId},${parsed.data.stageId})`,

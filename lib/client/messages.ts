@@ -1,4 +1,6 @@
 const messages: Record<string, string> = {
+  SUBJECT_CHANGED:
+    "حساب در تب دیگری تغییر کرده است. ورودی این حساب محفوظ است؛ صفحه را دوباره باز کنید.",
   PAYMENT_PROVIDER_UNAVAILABLE:
     "سرویس پرداخت پیکربندی نشده است؛ پرداخت واقعی فعال نیست.",
   PAYMENT_VERIFICATION_FAILED: "نتیجه پرداخت تأیید نشد؛ دسترسی ایجاد نشده است.",

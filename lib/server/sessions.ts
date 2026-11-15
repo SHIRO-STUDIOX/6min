@@ -3,6 +3,7 @@ import { sql } from "drizzle-orm";
 import { db } from "./db";
 import { demoContentAllowed } from "../contracts/content";
 import { ContentError } from "./content";
+import { assertExpectedSubject } from "./subject-consistency";
 import type { Subject } from "./identity";
 
 export const tokenHash = (value: string) =>
@@ -42,6 +43,7 @@ export async function authenticatedSession(request: Request) {
     WHERE s.token_hash=${tokenHash(token)} AND s.revoked_at IS NULL AND s.expires_at>now() AND u.phone_verified_at IS NOT NULL AND (u.auth_mode='real' OR ${demoContentAllowed()})`);
   const row = result.rows[0];
   if (!row) throw new ContentError("AUTHENTICATION_REQUIRED", 401);
+  assertExpectedSubject(request, String(row.user_id));
   return {
     subject: { id: row.user_id as string, kind: "user" } as Subject,
     hash: row.token_hash as string,

@@ -1,3 +1,8 @@
+import { MyPath } from "@/components/templates/my-path";
+import { Profile } from "@/components/templates/profile";
+import { Mistakes } from "@/components/templates/mistakes";
+import { Checkout } from "@/components/templates/checkout";
+import { Classroom } from "@/components/templates/classroom";
 import React from "react";
 import LegacyClassroom from "./legacy-classroom";
 import { AppFrame } from "@/components/templates/app-frame";
@@ -18,6 +23,72 @@ import { CompletionCard } from "@/components/organisms/completion-card";
 import { StageIndicator } from "@/components/molecules/StageIndicator";
 
 export const sandboxRegistry: SandboxComponent[] = [
+  {
+    id: "my-path",
+    name: "MyPath",
+    persianName: "مسیر من (بررسی متصل محلی)",
+    category: "organisms",
+    description:
+      "بررسی یکپارچه با API محلی؛ حالت مهمان و آزمایشی. داده نمایشی جایگزین نتیجه سرور نیست.",
+    filePath: "components/templates/my-path.tsx",
+    dependencies: ["@heroui/react"],
+    defaultProps: {},
+    propDefinitions: [],
+    render: () => <MyPath />,
+  },
+  {
+    id: "learner-profile",
+    name: "Profile",
+    persianName: "پروفایل (بررسی متصل محلی)",
+    category: "organisms",
+    description:
+      "بررسی یکپارچه با API محلی؛ حالت مهمان و آزمایشی. داده نمایشی جایگزین نتیجه سرور نیست.",
+    filePath: "components/templates/profile.tsx",
+    dependencies: ["@heroui/react"],
+    defaultProps: {},
+    propDefinitions: [],
+    render: () => <Profile />,
+  },
+  {
+    id: "mistakes",
+    name: "Mistakes",
+    persianName: "اشتباهات (بررسی متصل محلی)",
+    category: "organisms",
+    description:
+      "بررسی یکپارچه با API محلی؛ حالت مهمان و آزمایشی. داده نمایشی جایگزین نتیجه سرور نیست.",
+    filePath: "components/templates/mistakes.tsx",
+    dependencies: ["@heroui/react"],
+    defaultProps: {},
+    propDefinitions: [],
+    render: () => <Mistakes />,
+  },
+  {
+    id: "checkout",
+    name: "Checkout",
+    persianName: "پرداخت آزمایشی (بررسی متصل محلی)",
+    category: "organisms",
+    description:
+      "بررسی یکپارچه با API محلی؛ حالت مهمان و آزمایشی. داده نمایشی جایگزین نتیجه سرور نیست.",
+    filePath: "components/templates/checkout.tsx",
+    dependencies: ["@heroui/react"],
+    defaultProps: {},
+    propDefinitions: [],
+    render: () => <Checkout />,
+  },
+  {
+    id: "classroom",
+    name: "Classroom",
+    persianName: "کلاس متصل (بررسی متصل محلی)",
+    category: "organisms",
+    description:
+      "بررسی یکپارچه با API محلی؛ حالت مهمان و آزمایشی. داده نمایشی جایگزین نتیجه سرور نیست.",
+    filePath: "components/templates/classroom.tsx",
+    dependencies: ["@heroui/react"],
+    defaultProps: {},
+    propDefinitions: [],
+    render: () => <Classroom lessonId="de-01" />,
+  },
+
   { id: "app-frame", name: "AppFrame", persianName: "پوسته کلاس و ناوبری", category: "organisms", description: "هدر سه جزیره و داک سه مقصدی؛ بدون داده آموزشی نمونه عملیاتی.", filePath: "components/templates/app-frame.tsx", dependencies: ["@heroui/react"], defaultProps: {}, propDefinitions: [], render: () => <AppFrame><p className="p-6">پیش‌نمایش پوسته کلاس</p></AppFrame> },
   { id: "lesson-exercise", name: "LessonExercise", persianName: "تمرین متصل به FSM (پیش‌نمایش)", category: "organisms", description: "گزینه‌های عمومی؛ بدون نمره‌دهی یا ارسال تلاش در Sandbox.", filePath: "components/organisms/lesson-exercise.tsx", dependencies: ["@heroui/react", "useVocabularyFsm"], defaultProps: {}, propDefinitions: [], render: () => <LessonExercise model={null} lessonId="sandbox" revisionId="sandbox-v1" stage={{ id:"sandbox-matching",order:1,kind:"exercise",exerciseKind:"vocabulary-match",activityLocked:false,questions:[{id:"q1",revision:1,prompt:"Hallo",options:[{id:"a",text:"سلام"},{id:"b",text:"خداحافظ"}]},{id:"q2",revision:1,prompt:"Tschüss",options:[{id:"a",text:"سلام"},{id:"b",text:"خداحافظ"}]}]}} /> },
   { id: "legacy-classroom", name: "LegacyClassroom", persianName: "نمونه قدیمی کلاس (آرشیو Sandbox)", category: "organisms", description: "نمونه اولیه حفظ‌شده؛ امتیاز و پلیر آن عملیاتی نیست.", filePath: "components/sandbox/legacy-classroom.tsx", dependencies: ["Existing prototype cards"], defaultProps: {}, propDefinitions: [], render: () => <LegacyClassroom /> },

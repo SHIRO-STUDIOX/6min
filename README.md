@@ -1,42 +1,9 @@
-# Next.js & HeroUI Template
+# شیش — MVP learning application
 
-This is a template for creating applications using Next.js 16 (app directory) and HeroUI (v3).
+German lesson runtime built with Next.js, HeroUIv3, TypeScript and PostgreSQL. Classroom playback, server-graded exercises, weighted progression, mistake review, guest history/import, mock authentication, profile and TEST_ONLY checkout are connected end to end.
 
-[Try it on CodeSandbox](https://githubbox.com/heroui-inc/heroui/next-app-template)
+Start from [local development](docs/DEVELOPMENT.md), [execution status](docs/reports/mvp/STATUS.md), [Blueprints](docs/blueprints/README.md) and [execution policy](docs/MVP_EXECUTION_POLICY.md). `npm ci`, `npm run dev:setup`, `npm run dev` prepare the isolated development workflow. `/sandbox` preserves original components/FSMs and adds connected template QC stories.
 
-## Technologies Used
+This checkout contains a functional development MVP with3 synthetic published lessons and57 unpublished metadata slots. Real SMS/payment, final scoring/content, private production asset storage, hosting/privacy and visual/device signoff remain release gates. No operational launch is claimed. See [release gates](docs/reports/mvp/RELEASE_GATES.md).
 
-- [Next.js 16](https://nextjs.org/docs/getting-started)
-- [HeroUI v3](https://heroui.com/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [Tailwind Variants](https://tailwind-variants.org)
-- [TypeScript](https://www.typescriptlang.org/)
-- [next-themes](https://github.com/pacocoursey/next-themes)
-
-## How to Use
-
-### Use the template with create-next-app
-
-To create a new project based on this template using `create-next-app`, run the following command:
-
-```bash
-npx create-next-app -e https://github.com/heroui-inc/next-app-template
-```
-
-### Install dependencies
-
-You can use one of them `npm`, `yarn`, `pnpm`, `bun`, Example using `npm`:
-
-```bash
-npm install
-```
-
-### Run the development server
-
-```bash
-npm run dev
-```
-
-## License
-
-Licensed under the [MIT license](https://github.com/heroui-inc/next-app-template/blob/main/LICENSE).
+MIT license inherited from the original Next.js/HeroUI template; original synthetic media licensing is in public/demo/LICENSE.md.

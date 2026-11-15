@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@heroui/react";
 import { AppFrame } from "./app-frame";
 import { useLearner } from "@/hooks/use-learner";
-import { api } from "@/lib/client/api";
+import { scopedApi } from "@/lib/client/api";
 import { errorMessage } from "@/lib/client/messages";
 import { safeReturn } from "@/lib/domain/navigation";
 import {
@@ -24,6 +24,7 @@ type Item = PublicQuestion & {
 type Page = { items: Item[]; nextCursor: string | null };
 export function Mistakes({ returnTo }: { returnTo?: string }) {
   const { model, reload } = useLearner();
+  const api = scopedApi(model?.scope);
   const router = useRouter();
   const [items, setItems] = useState<Item[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);

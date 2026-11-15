@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { Button, Card } from "@heroui/react";
-import { api } from "@/lib/client/api";
+import { scopedApi } from "@/lib/client/api";
 import { errorMessage } from "@/lib/client/messages";
 import {
   playedInterval,
@@ -33,6 +33,7 @@ export type LessonVideoProps = {
   captionsUrl: string;
   durationMs: number;
   persist?: boolean;
+  subjectScope?: string;
   onCredit?: () => void;
   onInteract?: () => void;
   demoOnly?: boolean;
@@ -58,7 +59,9 @@ function LessonVideoRuntime({
   onCredit,
   onInteract,
   demoOnly = true,
+  subjectScope,
 }: LessonVideoProps) {
+  const api = scopedApi(subjectScope);
   const media = useRef<HTMLVideoElement | null>(null);
   const previous = useRef<PlaybackPoint | null>(null);
   const active = useRef(false);

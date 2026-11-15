@@ -3,6 +3,7 @@ import { sql } from "drizzle-orm";
 import { db } from "./db";
 import { authenticatedSession } from "./sessions";
 import { ContentError } from "./content";
+import { assertExpectedSubject } from "./subject-consistency";
 
 export type Subject = { id: string; kind: "guest" | "user" };
 const digest = (token: string) =>
@@ -58,7 +59,9 @@ export async function requestIdentity(request: Request): Promise<Subject> {
   ) {
     return (await authenticatedSession(request)).subject;
   }
-  return guestIdentity(request);
+  const subject = await guestIdentity(request);
+  assertExpectedSubject(request, subject.id);
+  return subject;
 }
 export async function optionalIdentity(
   request: Request,

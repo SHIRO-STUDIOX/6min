@@ -4,10 +4,11 @@ import { useRouter } from "next/navigation";
 import { Button, Avatar, TextField, Label, Input } from "@heroui/react";
 import { AppFrame } from "./app-frame";
 import { useLearner } from "@/hooks/use-learner";
-import { api } from "@/lib/client/api";
+import { scopedApi } from "@/lib/client/api";
 import { errorMessage } from "@/lib/client/messages";
 export function Profile() {
   const { model, error, reload } = useLearner();
+  const api = scopedApi(model?.scope);
   const router = useRouter();
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
@@ -101,7 +102,10 @@ export function Profile() {
                           method: "POST",
                           body: file,
                           credentials: "same-origin",
-                          headers: { "Content-Type": file.type },
+                          headers: {
+                            "Content-Type": file.type,
+                            "X-Expected-Subject": model.scope,
+                          },
                         });
                         const result = await response.json();
                         if (!response.ok) throw new Error(result.error.code);
@@ -118,7 +122,7 @@ export function Profile() {
                   onPress={() =>
                     void run(
                       () => api("/me/avatar", "DELETE"),
-                      "تصویر پروفایل حذف شد؛ سابقه فایل برای سیاست نگهداری محفوظ است.",
+                      "تصویر پروفایل برداشته شد.",
                     )
                   }
                 >
