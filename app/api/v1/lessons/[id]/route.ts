@@ -1,10 +1,16 @@
+import { optionalGuestIdentity } from "@/lib/server/identity";
 import { lessonPublic } from "@/lib/server/content";
 import { apiResponse } from "@/lib/server/http";
 
 export const dynamic = "force-dynamic";
 export async function GET(
-  _request: Request,
+  request: Request,
   context: { params: Promise<{ id: string }> },
 ) {
-  return apiResponse(async () => lessonPublic((await context.params).id));
+  return apiResponse(async () =>
+    lessonPublic(
+      (await context.params).id,
+      await optionalGuestIdentity(request),
+    ),
+  );
 }

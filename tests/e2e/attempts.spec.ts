@@ -17,7 +17,7 @@ test("S3 rejects absent identity, forged grades and cross-origin writes over HTT
     headers: { Origin: origin },
   });
   expect(bootstrap.status()).toBe(200);
-  expect((await bootstrap.json()).data).toEqual({ kind: "guest" });
+  expect((await bootstrap.json()).data).toMatchObject({ kind: "guest" });
   const input = {
     lessonId: "de-01",
     revisionId: "de-01-v1",

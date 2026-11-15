@@ -1,0 +1,9 @@
+# ADR-004 — Guest drafts, identity and three-free access
+
+Context: same-browser recovery and lossless later account import; clients cannot grant progress by changing local storage. Options: localStorage snapshots or transactional IndexedDB. Decision: idb 8.0.3 with versioned stores, scoped draft keys including exact revision, monotonic optimistic versions and stable per-scope import batch IDs. fake-indexeddb 6.2.4 is test-only; real browser persistence is also exercised. Store JSON exercise drafts, never authentication tokens/password/OTP/raw voice blobs. Scope is the guest's public subject ID; that ID does not authorize anything without the opaque HttpOnly cookie proof. Sandbox uses a distinct fixed scope so demo drafts cannot join a real guest batch.
+
+Guest scores/attempts/watch coverage live authoritatively in PostgreSQL; offline IndexedDB drafts earn no score and must be submitted/validated when connected. A failed storage operation is visible, never reported as durable. A failed import preserves source. Server acknowledgement marks the batch imported without automatically deleting source; a later edit creates a new batch. Existing account consent/import and copied server history belong to S7.
+
+Central access policy requires publication, pedagogical unlock and free/verified entitlement independently. Guest lessons 1–3 only; paid-client flags are ignored. Catalog/current lesson derive from own server progress; current lesson is the highest unlocked, not the last visited. Cookie proof expiry can require new identity; retained old browser drafts are not silently attributed to a new account. Cross-device guest recovery is not promised.
+
+Rollback: revert adapters/UI, retain browser and database records. No clear/delete/reset on failure or reload. Approval: reversible engineering decision under the current execution authorization; retention/privacy and visual QC remain owner release gates.

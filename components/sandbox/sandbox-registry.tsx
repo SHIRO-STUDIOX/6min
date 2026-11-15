@@ -1,4 +1,5 @@
 import React from "react";
+import { GuestDraftField } from "@/components/molecules/guest-draft-field";
 import { LessonVideo } from "@/components/organisms/lesson-video";
 import { SandboxComponent } from "./sandbox-types";
 import { FloatingHeader } from "@/components/organisms/floating-header";
@@ -13,6 +14,13 @@ import { CompletionCard } from "@/components/organisms/completion-card";
 import { StageIndicator } from "@/components/molecules/StageIndicator";
 
 export const sandboxRegistry: SandboxComponent[] = [
+  {
+    id: "guest-draft", name: "GuestDraftField", persianName: "پیش‌نویس مهمان (ذخیره محلی آزمایشی)", category: "molecules",
+    description: "ورودی نمونه برای بررسی بازیابی پیش‌نویس؛ بدون امتیاز و بدون تماس با دیتابیس.",
+    filePath: "components/molecules/guest-draft-field.tsx", dependencies: ["@heroui/react TextField", "idb"],
+    defaultProps: {}, propDefinitions: [],
+    render: () => <GuestDraftField scope="sandbox" lessonId="sandbox" revisionId="sandbox-v1" stageId="sandbox-draft" />,
+  },
   {
     id: "lesson-video", name: "LessonVideo", persianName: "پخش واقعی ویدیو (پیش‌نمایش بدون دیتابیس)", category: "organisms",
     description: "پخش‌کننده آماده با کنترل بومی و زیرنویس؛ نمونه آزمایشی بدون ثبت امتیاز.",

@@ -1,6 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
 import { sql } from "drizzle-orm";
 import { db } from "./db";
+import { assertCommercialAccess } from "./access";
 import { recordMistake, recomputeProgress } from "./progression";
 import { ContentError } from "./content";
 import type { Subject } from "./identity";
@@ -64,8 +65,7 @@ export async function submitAttempt(
       throw new ContentError("CONTENT_UNAVAILABLE", 404);
     if (lesson.current_revision_id !== body.revisionId)
       throw new ContentError("STALE_CONTENT", 409);
-    if (Number(lesson.sequence_number) > 3)
-      throw new ContentError("ENTITLEMENT_REQUIRED", 403);
+    await assertCommercialAccess(tx, subject, Number(lesson.sequence_number));
     const progress = await tx.execute(
       sql`SELECT video_credited,unlocked_at FROM lesson_progress WHERE subject_id=${subject.id} AND lesson_id=${body.lessonId}`,
     );

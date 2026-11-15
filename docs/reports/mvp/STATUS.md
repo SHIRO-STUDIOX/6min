@@ -11,8 +11,9 @@ Branch: feat/shish-mvp.
 | S2 | Complete | S2.md; e2f8bde |
 | S3 | Complete | S3.md; 8334200 |
 | S4 | Complete | S4.md; 3164530 |
-| S5 | Complete | S5.md; commit recorded at next checkpoint |
-| S6 | In progress | Guest browser drafts and three-free access |
-| S7–S11 | Not started | No acceptance claimed |
+| S5 | Complete | S5.md; c5bb3bb |
+| S6 | Complete | S6.md; commit recorded at next checkpoint |
+| S7 | In progress | Mock-provider auth, sessions and consent-based import |
+| S8–S11 | Not started | No acceptance claimed |
 
-Next: S6 transactional browser guest drafts, shared access policy and three-free recovery.
+Next: S7 replaceable mock SMS, OTP/password/recovery, secure sessions and idempotent guest import with existing-account consent.

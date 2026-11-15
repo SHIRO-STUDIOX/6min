@@ -47,3 +47,14 @@ export async function createGuest(request: Request) {
     cookie: `shish_guest=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=2592000${new URL(request.url).protocol === "https:" ? "; Secure" : ""}`,
   };
 }
+
+export async function optionalGuestIdentity(
+  request: Request,
+): Promise<Subject | null> {
+  try {
+    return await guestIdentity(request);
+  } catch (error) {
+    if (error instanceof ContentError && error.status === 401) return null;
+    throw error;
+  }
+}

@@ -9,7 +9,7 @@ export async function POST(request: Request) {
     await rateLimit("guest-bootstrap-global", 120);
     const result = await createGuest(request);
     cookie = result.cookie;
-    return { kind: result.subject.kind };
+    return { kind: result.subject.kind, guestId: result.subject.id };
   });
   if (cookie) response.headers.set("Set-Cookie", cookie);
   return response;

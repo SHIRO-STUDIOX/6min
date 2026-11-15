@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { sql } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "./db";
+import { assertCommercialAccess } from "./access";
 import { recomputeProgress } from "./progression";
 import { ContentError } from "./content";
 import type { Subject } from "./identity";
@@ -55,8 +56,7 @@ export async function startWatch(subject: Subject, input: unknown) {
       lesson.video_asset_id !== body.data.videoAssetId
     )
       throw new ContentError("STALE_CONTENT", 409);
-    if (Number(lesson.sequence_number) > 3)
-      throw new ContentError("ENTITLEMENT_REQUIRED", 403);
+    await assertCommercialAccess(tx, subject, Number(lesson.sequence_number));
     const progress = await tx.execute(
       sql`SELECT unlocked_at FROM lesson_progress WHERE subject_id=${subject.id} AND lesson_id=${body.data.lessonId}`,
     );
