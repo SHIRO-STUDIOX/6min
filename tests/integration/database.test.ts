@@ -7,11 +7,11 @@ afterAll(async () => {
 });
 
 describe("S1 real PostgreSQL invariants", () => {
-  it("has a migrated, seeded course without publishing unfinished content", async () => {
+  it("has 60 slots and keeps 57 unfinished lessons unpublished", async () => {
     const result = await pool.query(
-      "SELECT published FROM lessons WHERE id='de-01'",
+      "SELECT count(*)::int AS total, count(*) FILTER (WHERE published)::int AS published FROM lessons WHERE course_id='shish-de-60'",
     );
-    expect(result.rows).toEqual([{ published: false }]);
+    expect(result.rows).toEqual([{ total: 60, published: 3 }]);
   });
 
   it("rolls back an entire transaction on a duplicate attempt key", async () => {

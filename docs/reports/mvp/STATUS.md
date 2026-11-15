@@ -7,8 +7,9 @@ Branch: feat/shish-mvp.
 | Stage | State | Evidence |
 |---|---|---|
 | S0 | Complete | S0.md; 5539e81 |
-| S1 | Complete | S1.md; commit recorded at next checkpoint |
-| S2 | In progress | Content fixtures and public DTOs |
-| S3–S11 | Not started | No acceptance claimed |
+| S1 | Complete | S1.md; f31d9a3 |
+| S2 | Complete | S2.md; commit recorded at next checkpoint |
+| S3 | In progress | Server grading and full attempts |
+| S4–S11 | Not started | No acceptance claimed |
 
-Next: S2 metadata slots, three versioned synthetic German fixtures, public DTO/API confidentiality tests. No Production services or real payments enabled.
+Next: S3 deterministic grading, full attempt persistence/idempotency and existing FSM adapter boundary.
