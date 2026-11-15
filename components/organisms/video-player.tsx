@@ -333,6 +333,10 @@ export function VideoPlayer({
       {/* لایه پس‌زمینه ویدیو با تصویر فلوئید گلس و افکت‌های انکسار نوری */}
       {/* ======================================================== */}
       <div
+        role="button"
+        tabIndex={0}
+        aria-label="پخش یا توقف ویدیو"
+        onKeyDown={(event) => { if (event.target === event.currentTarget && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); togglePlay(); } }}
         onClick={togglePlay}
         className="absolute inset-0 bg-default-950 flex items-center justify-center cursor-pointer overflow-hidden"
       >

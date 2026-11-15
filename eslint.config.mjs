@@ -1,6 +1,7 @@
 import { defineConfig, globalIgnores } from "eslint/config";
 import { fixupConfigRules, fixupPluginRules } from "@eslint/compat";
 import react from "eslint-plugin-react";
+import nextPlugin from "@next/eslint-plugin-next";
 import unusedImports from "eslint-plugin-unused-imports";
 import _import from "eslint-plugin-import";
 import typescriptEslint from "@typescript-eslint/eslint-plugin";
@@ -23,12 +24,14 @@ const compat = new FlatCompat({
 
 export default defineConfig([globalIgnores([
     ".now/*",
+    ".heroui-docs/**",
+    "test-results/**",
+    "playwright-report/**",
     "**/*.css",
     "**/.changeset",
     "**/dist",
     "esm/*",
     "public/*",
-    "tests/*",
     "scripts/*",
     "**/*.config.js",
     "**/.DS_Store",
@@ -48,10 +51,10 @@ export default defineConfig([globalIgnores([
         "plugin:prettier/recommended",
         "plugin:react-hooks/recommended",
         "plugin:jsx-a11y/recommended",
-        "plugin:@next/next/recommended",
     )),
 
     plugins: {
+        "@next/next": nextPlugin,
         react: fixupPluginRules(react),
         "unused-imports": unusedImports,
         import: fixupPluginRules(_import),
@@ -86,6 +89,7 @@ export default defineConfig([globalIgnores([
     files: ["**/*.ts", "**/*.tsx"],
 
     rules: {
+        ...nextPlugin.configs.recommended.rules,
         "no-console": "warn",
         "react/prop-types": "off",
         "react/jsx-uses-react": "off",

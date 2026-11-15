@@ -263,6 +263,13 @@ export function SandboxCanvas() {
         >
           {/* هندل تغییر اندازه سمت چپ */}
           <div
+            role="slider"
+            tabIndex={0}
+            aria-label="عرض بوم"
+            aria-valuemin={320}
+            aria-valuemax={1920}
+            aria-valuenow={customWidth}
+            onKeyDown={(event) => { if (event.key === "ArrowLeft" || event.key === "ArrowRight") { event.preventDefault(); setCustomWidth(Math.min(1920, Math.max(320, customWidth + (event.key === "ArrowRight" ? 10 : -10)))); setViewportMode("custom"); } }}
             onMouseDown={() => setIsResizing(true)}
             className="absolute -left-3.5 top-1/2 -translate-y-1/2 w-7 h-16 rounded-full bg-background/90 border border-default-300 hover:border-accent shadow-lg flex items-center justify-center cursor-ew-resize opacity-0 hover:opacity-100 transition-opacity z-30 group"
             title="درگ جهت تغییر عرض بوم"
@@ -317,6 +324,13 @@ export function SandboxCanvas() {
 
           {/* هندل تغییر اندازه سمت راست */}
           <div
+            role="slider"
+            tabIndex={0}
+            aria-label="عرض بوم"
+            aria-valuemin={320}
+            aria-valuemax={1920}
+            aria-valuenow={customWidth}
+            onKeyDown={(event) => { if (event.key === "ArrowLeft" || event.key === "ArrowRight") { event.preventDefault(); setCustomWidth(Math.min(1920, Math.max(320, customWidth + (event.key === "ArrowRight" ? 10 : -10)))); setViewportMode("custom"); } }}
             onMouseDown={() => setIsResizing(true)}
             className="absolute -right-3.5 top-1/2 -translate-y-1/2 w-7 h-16 rounded-full bg-background/90 border border-default-300 hover:border-accent shadow-lg flex items-center justify-center cursor-ew-resize opacity-0 hover:opacity-100 transition-opacity z-30 group"
             title="درگ جهت تغییر عرض بوم"

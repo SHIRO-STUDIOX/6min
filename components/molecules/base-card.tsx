@@ -82,7 +82,7 @@ export function BaseCard({
           </span>
         )}
         <Card.Title
-          render={(props) => <h4 {...props} />}
+          render={(props) => <h4 {...props}>{props.children}</h4>}
           className="text-xl font-semibold text-foreground tracking-tight leading-[1.33] line-clamp-1"
         >
           {title}

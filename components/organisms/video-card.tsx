@@ -19,6 +19,8 @@ export interface VideoCardProps {
   poster?: string;
   /** آدرس فایل ویدیویی (اختیاری) */
   videoSrc?: string;
+  /** Caption asset for supplied spoken media. */
+  captionsSrc?: string;
   /** مدت زمان کل ویدیو به ثانیه (پیش‌فرض: ۱۸۰ ثانیه / ۳ دقیقه) */
   duration?: number;
   /** درصد پیش‌فرض مشاهده (۰ تا ۱۰۰) */
@@ -59,6 +61,7 @@ export function VideoCard({
   description = "بریم توی این ویدیو الفبا رو یادبگیریم",
   poster = "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80",
   videoSrc,
+  captionsSrc,
   duration = 180,
   initialProgress = 0,
   isCompleted: initialIsCompleted = false,
@@ -176,6 +179,10 @@ export function VideoCard({
     >
       <div
         ref={videoContainerRef}
+        role="button"
+        tabIndex={0}
+        aria-label="پخش یا توقف ویدیو"
+        onKeyDown={(event) => { if (event.target === event.currentTarget && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); handleTogglePlay(); } }}
         onClick={handleTogglePlay}
         className="relative w-full aspect-video rounded-2xl overflow-hidden border border-separator bg-black/90 group/video shadow-md transition-all duration-300 isolate cursor-pointer"
       >
@@ -185,7 +192,9 @@ export function VideoCard({
             ref={videoElementRef}
             src={videoSrc}
             className="w-full h-full object-cover"
-          />
+          >
+            <track kind="captions" src={captionsSrc} srcLang="de" label="Deutsch" default />
+          </video>
         )}
 
         {/* لایه گرادیانت و افکت نوری شیشه‌ای */}

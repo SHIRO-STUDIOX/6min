@@ -143,6 +143,10 @@ export function SandboxSidebarCatalog() {
             return (
               <div
                 key={comp.id}
+                role="button"
+                tabIndex={0}
+                aria-pressed={isSelected}
+                onKeyDown={(event) => { if (event.target === event.currentTarget && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); setSelectedId(comp.id); } }}
                 onClick={() => setSelectedId(comp.id)}
                 className={`group relative p-2.5 rounded-2xl border transition-all duration-200 cursor-pointer flex flex-col gap-1.5 ${
                   isSelected
