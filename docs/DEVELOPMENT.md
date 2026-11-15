@@ -57,3 +57,19 @@ This restricted helper only reads isolated shish_test on55432, creates a fresh u
 ## Scope and release limits
 
 Only3 published synthetic lessons,57 unpublished slots, silent10s CC0 test video. Test weight20/threshold70 are fixtures, not approved final scoring. Pronunciation/dictation prototypes remain in Sandbox; live pronunciation grading requires a real approved evaluator and supplied content. SMS uses public demo000000 only guarded development/test. Checkout uses fictional TEST units and a local signed simulator; real gateway sandbox proof unrun. Avatar storage private local dev only. No push/merge/public deploy/real SMS/payment occurred. See FINAL.md and RELEASE_GATES.md for owner decisions and visual/device QC.
+
+## Windows / Docker startup troubleshooting
+
+In PowerShell, start Docker Desktop and wait for its Engine to be running. Select **Linux containers**. Verify the daemon before setup:
+
+```powershell
+docker info
+npm run dev:setup
+npx next dev -p 3000
+```
+
+Port3000 avoids browsers that reject the original6006 port. If Next is already running, stop it with Ctrl+C before setup and restart afterward so it loads newly generated .env.local. The helper checks the Docker daemon first and reports CLI/Engine/platform/image-download/port errors without printing credentials. An image download failure may require fixing Docker Desktop network/proxy/registry access; the helper prints a pinned docker pull command for a direct diagnostic. Do not disable TLS verification.
+
+The helper now runs migration/seed through the current Node executable, avoiding Windows npm.cmd shell execution. Existing .env settings are checked before service mutation; local setup keys are saved to .env.local without overwriting unrelated settings. Interrupted first setup may recover only when the retained private credentials match the exact helper container/image/volume. Unknown credentials or missing configured services require inspection; never delete project volumes or reset data as a workaround.
+
+A 401 on /api/v1/me is expected for a guest. A 503 on /api/v1/guest/bootstrap means the database/service is unavailable; starting Next alone does not initialize the database. After successful setup and restart, check http://localhost:3000/api/v1/health for data.ready=true. Never paste .env files or password values into support messages.
