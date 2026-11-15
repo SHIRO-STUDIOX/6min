@@ -36,7 +36,7 @@ export async function mistakes(
   const rows =
     await db.execute(sql`SELECT m.question_id,m.question_revision,m.status,
     to_char(m.latest_wrong_at AT TIME ZONE 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS latest_wrong_at,
-    q.public_config,s.id AS stage_id,l.id AS lesson_id,r.id AS revision_id
+    q.public_config,s.id AS stage_id,s.exercise_type,l.id AS lesson_id,r.id AS revision_id
     FROM mistake_current m JOIN questions q ON q.id=m.question_id AND q.revision=m.question_revision
     JOIN stages s ON s.id=q.stage_id JOIN lesson_revisions r ON r.id=s.revision_id JOIN lessons l ON l.id=r.lesson_id
     WHERE m.subject_id=${subject.id} AND m.status=${status} AND l.published AND l.current_revision_id=r.id
@@ -48,6 +48,7 @@ export async function mistakes(
     status: row.status,
     latestWrongAt: row.latest_wrong_at,
     stageId: row.stage_id,
+    exerciseKind: row.exercise_type,
     lessonId: row.lesson_id,
     revisionId: row.revision_id,
     ...publicQuestionSchema.parse(row.public_config),
@@ -90,7 +91,7 @@ export async function reviewQuestions(subject: Subject, input: unknown) {
   const entitled = await commercialAllowed(subject, 4);
   for (const ref of parsed.data.questionRefs) {
     const rows =
-      await db.execute(sql`SELECT q.id,q.revision,q.public_config,s.id AS stage_id,l.id AS lesson_id,r.id AS revision_id
+      await db.execute(sql`SELECT q.id,q.revision,q.public_config,s.id AS stage_id,s.exercise_type,l.id AS lesson_id,r.id AS revision_id
       FROM mistake_current m JOIN questions q ON q.id=m.question_id AND q.revision=m.question_revision
       JOIN stages s ON s.id=q.stage_id JOIN lesson_revisions r ON r.id=s.revision_id JOIN lessons l ON l.id=r.lesson_id
       WHERE m.subject_id=${subject.id} AND m.question_id=${ref.id} AND m.question_revision=${ref.revision} AND m.status='needsReview'
@@ -101,6 +102,7 @@ export async function reviewQuestions(subject: Subject, input: unknown) {
       questionId: row.id,
       revision: row.revision,
       stageId: row.stage_id,
+      exerciseKind: row.exercise_type,
       lessonId: row.lesson_id,
       revisionId: row.revision_id,
       ...publicQuestionSchema.parse(row.public_config),

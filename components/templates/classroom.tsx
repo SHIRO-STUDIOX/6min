@@ -19,6 +19,7 @@ import {
 import { api } from "@/lib/client/api";
 import { loadLearner } from "@/lib/client/learner";
 import { errorMessage } from "@/lib/client/messages";
+import { safeReturn } from "@/lib/domain/navigation";
 import type { Learner, LessonDTO } from "@/lib/contracts/experience";
 
 export function Classroom({
@@ -36,6 +37,7 @@ export function Classroom({
   const [error, setError] = useState("");
   const [unlock, setUnlock] = useState<string | null>(null);
   const [drag, setDrag] = useState(0);
+  const [reviewReturn, setReviewReturn] = useState<string | null>(null);
   const gesture = useRef<{ x: number; y: number; id: number } | null>(null);
   const activeIndex = useRef(0);
   activeIndex.current = index;
@@ -73,6 +75,8 @@ export function Classroom({
     [lessonId, initialStageId],
   );
   useEffect(() => {
+    const intent = new URLSearchParams(window.location.search).get("returnTo");
+    setReviewReturn(intent ? safeReturn(intent) : null);
     void load(true);
   }, [lessonId]);
   const stage = lesson?.stages[index];
@@ -142,6 +146,11 @@ export function Classroom({
           <p className="text-sm text-muted">
             نمونه آزمایشی؛ محتوای نهایی دوره نیست.
           </p>
+        )}
+        {reviewReturn && (
+          <Button variant="secondary" onPress={() => router.push(reviewReturn)}>
+            بازگشت به مرور اشتباهات
+          </Button>
         )}
         {lesson && (
           <p role="status">

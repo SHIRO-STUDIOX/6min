@@ -19,7 +19,11 @@ export async function subjectProgress(subject: Subject) {
   const days = await db.execute(
     sql`SELECT DISTINCT to_char(completed_at AT TIME ZONE 'Asia/Tehran','YYYY-MM-DD') AS day FROM learning_attempts WHERE subject_id=${subject.id} AND kind='full' ORDER BY day DESC LIMIT 180`,
   );
+  const review = await db.execute(
+    sql`SELECT DISTINCT r.lesson_id FROM mistake_current m JOIN questions q ON q.id=m.question_id AND q.revision=m.question_revision JOIN stages s ON s.id=q.stage_id JOIN lesson_revisions r ON r.id=s.revision_id WHERE m.subject_id=${subject.id} AND m.status='needsReview'`,
+  );
   return {
+    needsReview: review.rows.map((row) => row.lesson_id),
     subject,
     lessons,
     selectedContext: selected.rows[0] ?? null,

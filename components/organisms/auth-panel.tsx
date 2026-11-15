@@ -1,4 +1,5 @@
 "use client";
+import { safeReturn as validatedReturn } from "@/lib/domain/navigation";
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -19,11 +20,7 @@ type Preview = {
   canAutoImport: boolean;
   requiresConsent: boolean;
 };
-const safeReturn = (path: string) =>
-  /^\/(classroom|path|profile|mistakes|sandbox)(\/|\?|$)/.test(path) &&
-  !path.startsWith("//")
-    ? path
-    : "/";
+const safeReturn = (path: string) => validatedReturn(path, "/");
 
 export function AuthPanel({
   preview = false,

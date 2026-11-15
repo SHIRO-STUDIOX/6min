@@ -1,4 +1,4 @@
-import { Destination } from "@/components/templates/destination";
+import { Profile } from "@/components/templates/profile";
 export default function Page() {
-  return <Destination destination="profile" />;
+  return <Profile />;
 }

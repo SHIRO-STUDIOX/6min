@@ -1,20 +1,18 @@
-import { sql } from "drizzle-orm";
-import { db } from "@/lib/server/db";
 import { authenticatedSession } from "@/lib/server/sessions";
 import { apiResponse } from "@/lib/server/http";
-
+import { requireSameOrigin } from "@/lib/server/identity";
+import { readJson, rateLimit } from "@/lib/server/request-security";
+import { profile, updateProfile } from "@/lib/server/profile";
 export async function GET(request: Request) {
+  return apiResponse(async () =>
+    profile((await authenticatedSession(request)).subject.id),
+  );
+}
+export async function PATCH(request: Request) {
   return apiResponse(async () => {
+    requireSameOrigin(request);
     const { subject } = await authenticatedSession(request);
-    const result = await db.execute(
-      sql`SELECT id,display_name,avatar_key,auth_mode FROM users WHERE id=${subject.id}`,
-    );
-    const user = result.rows[0];
-    return {
-      id: user.id,
-      displayName: user.display_name,
-      avatarKey: user.avatar_key,
-      authMode: user.auth_mode,
-    };
+    await rateLimit(`profile:${subject.id}`, 20);
+    return updateProfile(subject.id, await readJson(request));
   });
 }

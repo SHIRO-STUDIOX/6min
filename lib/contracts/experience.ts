@@ -26,6 +26,7 @@ export type LessonDTO = {
   stages: PublicStage[];
 };
 export type ProgressDTO = {
+  needsReview: string[];
   subject: { id: string; kind: "guest" | "user" };
   lessons: CatalogItem[];
   currentLesson: string;

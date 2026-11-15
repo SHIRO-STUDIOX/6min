@@ -1,4 +1,4 @@
-import { Destination } from "@/components/templates/destination";
+import { MyPath } from "@/components/templates/my-path";
 export default function Page() {
-  return <Destination destination="path" />;
+  return <MyPath />;
 }
