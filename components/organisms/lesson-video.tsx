@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { Button, Card } from "@heroui/react";
 import { api } from "@/lib/client/api";
+import { errorMessage } from "@/lib/client/messages";
 import {
   playedInterval,
   unionRanges,
@@ -269,7 +270,9 @@ function LessonVideoRuntime({
         </p>
         {error && (
           <>
-            <p role="alert">{error} — پیشرفت جدید هنوز تأیید نشده است.</p>
+            <p role="alert">
+              {errorMessage(error)} — پیشرفت جدید هنوز تأیید نشده است.
+            </p>
             <Button
               onPress={() => {
                 if (session.current) void sync();

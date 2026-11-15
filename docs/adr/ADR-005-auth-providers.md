@@ -1,0 +1,13 @@
+# ADR-005 — Development-only SMS and credential lifecycle
+
+Context: SMS vendor/country/hosting remain unspecified; owner authorizes mock adapters, never real messages/Production claims. Existing Telegram admin helper is not a learner SMS gateway and is not reused.
+
+Decision: explicit SHISH_SMS_PROVIDER=mock plus development/test demo opt-in. Fixed 000000 is a labeled demonstration code only, not an operational secret. No network sends, plaintext-code outbox/logs, or live adapter. Store salted challenge digest, purpose, 5-minute expiry, 5 attempts and 60-second resend cooldown. Persistent per-phone/device/global request budgets and challenge verify budget. Mock account realm is rejected outside development/test; deploying with mock SMS cannot make learner identity live. Real SMS/region/staging verification is an external release gate.
+
+Use built-in vetted scrypt (N=32768,r=8,p=1, random 16-byte salt, 32-byte key; 64MiB memory cap), 12–128 character set/reset input and constant-time verification/dummy work for missing users. OTP-only users get no guessed password. Recovery grants are short-lived, single-use, memory-only client state; password reset revokes old sessions. Opaque session cookies are HttpOnly/SameSite=Lax, Secure on HTTPS or Production. Rotate on login/refresh; logout revokes the current session. Preserve original authenticated_at on refresh so refresh cannot turn stale authentication into recent proof or extend auto-import permission.
+
+Normalize E.164 with provisional Iranian 09 UI support; no final country coverage claimed. Public unauthenticated responses do not disclose account existence. Once phone ownership is verified, new/existing account status supports correct merge consent. Authenticated writes enforce same origin; IP-header trust is not guessed from untrusted X-Forwarded-For. Global/device/phone budgets work now; production trusted proxy/IP and vendor cost limits must be configured and tested before live SMS.
+
+New-account auto-import permission comes from a recent server session bound to the source guest proof, never a posted newAccount flag. Existing account/password login requires affirmative consent. Preserve source and account data, server history regrading, stable per-source link IDs and atomic batch receipts. Full import policy/evidence is documented in the S7 report.
+
+Rollback code without clearing histories, browser drafts, sessions or user records. No destructive migration, no Production message/payment/deployment. Approval: reversible engineering choices under owner authorization; product privacy/retention/region/providers remain open.

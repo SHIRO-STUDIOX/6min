@@ -18,6 +18,7 @@ jobs:
       TEST_DATABASE_URL: postgresql://shish:ci-only-isolated@localhost:5432/shish_test
       SHISH_DEMO_MODE: '1'
       SHISH_ENV: test
+      SHISH_SMS_PROVIDER: mock
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

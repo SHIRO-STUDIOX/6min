@@ -1,6 +1,7 @@
 import { createHash, randomBytes, randomUUID } from "node:crypto";
 import { sql } from "drizzle-orm";
 import { db } from "./db";
+import { authenticatedSession } from "./sessions";
 import { ContentError } from "./content";
 
 export type Subject = { id: string; kind: "guest" | "user" };
@@ -48,6 +49,27 @@ export async function createGuest(request: Request) {
   };
 }
 
+export async function requestIdentity(request: Request): Promise<Subject> {
+  if (
+    request.headers
+      .get("cookie")
+      ?.split(";")
+      .some((part) => part.trim().startsWith("shish_session="))
+  ) {
+    return (await authenticatedSession(request)).subject;
+  }
+  return guestIdentity(request);
+}
+export async function optionalIdentity(
+  request: Request,
+): Promise<Subject | null> {
+  try {
+    return await requestIdentity(request);
+  } catch (error) {
+    if (error instanceof ContentError && error.status === 401) return null;
+    throw error;
+  }
+}
 export async function optionalGuestIdentity(
   request: Request,
 ): Promise<Subject | null> {

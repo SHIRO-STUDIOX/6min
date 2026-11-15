@@ -5,7 +5,17 @@ import {
   guestBatch,
   loadGuestDraft,
   saveGuestDraft,
+  pendingGuestBatch,
 } from "../../lib/client/guest-store";
+
+it("creates one fresh stable batch for new server history after acknowledgement without deleting source", async () => {
+  const scope = crypto.randomUUID();
+  const first = await guestBatch(scope);
+  await acknowledgeGuestImport(scope, first.batchId, true);
+  const next = await pendingGuestBatch(scope);
+  expect(next.batchId).not.toBe(first.batchId);
+  expect((await pendingGuestBatch(scope)).batchId).toBe(next.batchId);
+});
 
 it("retains drafts across connections, isolates scopes/revisions and rejects stale concurrent versions", async () => {
   const scope = crypto.randomUUID();

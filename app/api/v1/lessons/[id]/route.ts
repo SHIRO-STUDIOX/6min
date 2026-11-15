@@ -1,4 +1,4 @@
-import { optionalGuestIdentity } from "@/lib/server/identity";
+import { optionalIdentity } from "@/lib/server/identity";
 import { lessonPublic } from "@/lib/server/content";
 import { apiResponse } from "@/lib/server/http";
 
@@ -10,7 +10,7 @@ export async function GET(
   return apiResponse(async () =>
     lessonPublic(
       (await context.params).id,
-      await optionalGuestIdentity(request),
+      await optionalIdentity(request),
     ),
   );
 }

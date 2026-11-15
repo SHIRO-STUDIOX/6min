@@ -125,3 +125,21 @@ export async function acknowledgeGuestImport(
     db.close();
   }
 }
+
+/** Use a new batch for newly accepted server history after an earlier acknowledged import. */
+export async function pendingGuestBatch(scope: string) {
+  const db = await database();
+  try {
+    const tx = db.transaction("meta", "readwrite");
+    const previous = await tx.store.get(scope);
+    if (!previous || previous.imported)
+      await tx.store.put(
+        { batchId: crypto.randomUUID(), imported: false },
+        scope,
+      );
+    await tx.done;
+  } finally {
+    db.close();
+  }
+  return guestBatch(scope);
+}

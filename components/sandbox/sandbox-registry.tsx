@@ -1,4 +1,5 @@
 import React from "react";
+import { AuthPanel } from "@/components/organisms/auth-panel";
 import { GuestDraftField } from "@/components/molecules/guest-draft-field";
 import { LessonVideo } from "@/components/organisms/lesson-video";
 import { SandboxComponent } from "./sandbox-types";
@@ -14,6 +15,12 @@ import { CompletionCard } from "@/components/organisms/completion-card";
 import { StageIndicator } from "@/components/molecules/StageIndicator";
 
 export const sandboxRegistry: SandboxComponent[] = [
+  {
+    id: "auth-panel", name: "AuthPanel", persianName: "ورود و بازیابی (پیش‌نمایش بدون ارسال)", category: "organisms",
+    description: "ورود با کامپوننت‌های موجود؛ پیش‌نمایش بدون ورود، ارسال پیامک یا تماس با دیتابیس.",
+    filePath: "components/organisms/auth-panel.tsx", dependencies: ["@heroui/react", "PhoneLogin"],
+    defaultProps: {}, propDefinitions: [], render: () => <AuthPanel preview />,
+  },
   {
     id: "guest-draft", name: "GuestDraftField", persianName: "پیش‌نویس مهمان (ذخیره محلی آزمایشی)", category: "molecules",
     description: "ورودی نمونه برای بررسی بازیابی پیش‌نویس؛ بدون امتیاز و بدون تماس با دیتابیس.",

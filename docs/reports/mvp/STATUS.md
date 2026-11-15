@@ -12,8 +12,9 @@ Branch: feat/shish-mvp.
 | S3 | Complete | S3.md; 8334200 |
 | S4 | Complete | S4.md; 3164530 |
 | S5 | Complete | S5.md; c5bb3bb |
-| S6 | Complete | S6.md; commit recorded at next checkpoint |
-| S7 | In progress | Mock-provider auth, sessions and consent-based import |
-| S8–S11 | Not started | No acceptance claimed |
+| S6 | Complete | S6.md; b691678 |
+| S7 | Complete (mock provider) | S7.md; commit recorded at next checkpoint |
+| S8 | In progress | Classroom shell, navigation and resume |
+| S9–S11 | Not started | No acceptance claimed |
 
-Next: S7 replaceable mock SMS, OTP/password/recovery, secure sessions and idempotent guest import with existing-account consent.
+Next: S8 functional classroom, existing FSM bridges, locked-stage selection, dock/header and state restoration. No live provider or deployment authorized.
