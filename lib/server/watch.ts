@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { sql } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "./db";
+import { recomputeProgress } from "./progression";
 import { ContentError } from "./content";
 import type { Subject } from "./identity";
 import { demoContentAllowed } from "../contracts/content";
@@ -145,7 +146,13 @@ export async function updateWatch(
     await tx.execute(sql`INSERT INTO lesson_progress(subject_id,lesson_id,video_credited,current_revision,last_activity_at,unlocked_at)
       VALUES (${subject.id},${session.lesson_id as string},${credited},${session.revision_id as string},now(),CASE WHEN ${session.lesson_id as string}='de-01' THEN now() ELSE NULL END)
       ON CONFLICT(subject_id,lesson_id) DO UPDATE SET video_credited=lesson_progress.video_credited OR excluded.video_credited,last_activity_at=now()`);
+    const progression = await recomputeProgress(
+      tx,
+      subject.id,
+      session.lesson_id as string,
+    );
     return {
+      ...progression,
       coverage: watchedMs(merged) / duration,
       credited,
       positionMs: body.lastPositionMs,

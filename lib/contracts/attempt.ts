@@ -18,7 +18,7 @@ export const attemptSchema = z
     lessonId: z.string().min(1).max(120),
     revisionId: z.string().min(1).max(120),
     stageId: z.string().min(1).max(120),
-    kind: z.literal("full"),
+    kind: z.enum(["full", "review"]),
     completed: z.literal(true),
     answers: z.array(answerSchema).min(1).max(64),
   })

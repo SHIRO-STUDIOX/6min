@@ -10,8 +10,9 @@ Branch: feat/shish-mvp.
 | S1 | Complete | S1.md; f31d9a3 |
 | S2 | Complete | S2.md; e2f8bde |
 | S3 | Complete | S3.md; 8334200 |
-| S4 | Complete | S4.md; commit recorded at next checkpoint |
-| S5 | In progress | Weighted score, mistakes and monotonic unlock |
-| S6–S11 | Not started | No acceptance claimed |
+| S4 | Complete | S4.md; 3164530 |
+| S5 | Complete | S5.md; commit recorded at next checkpoint |
+| S6 | In progress | Guest browser drafts and three-free access |
+| S7–S11 | Not started | No acceptance claimed |
 
-Next: S5 exact weighted scoring, best full + later review amendments, mistake events and persisted successor unlock.
+Next: S6 transactional browser guest drafts, shared access policy and three-free recovery.
