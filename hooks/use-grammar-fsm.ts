@@ -19,7 +19,8 @@ export const DEFAULT_GRAMMAR_SENTENCES: GrammarSentence[] = [
     tokens: ["I", "am", "learning", "English", "grammar"],
     distractors: ["is", "learn", "reads"],
     translation: "من در حال یادگیری گرامر انگلیسی هستم",
-    audioUrl: "https://dict.youdao.com/dictvoice?audio=I+am+learning+English+grammar&type=2",
+    audioUrl:
+      "https://dict.youdao.com/dictvoice?audio=I+am+learning+English+grammar&type=2",
     hint: "برای فاعل I از فعل کمکی am و فرم ing استفاده می‌شود.",
   },
   {
@@ -28,7 +29,8 @@ export const DEFAULT_GRAMMAR_SENTENCES: GrammarSentence[] = [
     tokens: ["She", "reads", "new", "books", "every", "day"],
     distractors: ["reading", "is", "novel"],
     translation: "او هر روز کتاب‌های جدید می‌خواند",
-    audioUrl: "https://dict.youdao.com/dictvoice?audio=She+reads+new+books+every+day&type=2",
+    audioUrl:
+      "https://dict.youdao.com/dictvoice?audio=She+reads+new+books+every+day&type=2",
     hint: "در حال ساده برای سوم‌شخص مفرد (She) فعل s می‌گیرد.",
   },
   {
@@ -37,7 +39,8 @@ export const DEFAULT_GRAMMAR_SENTENCES: GrammarSentence[] = [
     tokens: ["They", "are", "designing", "a", "modern", "application"],
     distractors: ["is", "designed", "an"],
     translation: "آن‌ها در حال طراحی یک اپلیکیشن مدرن هستند",
-    audioUrl: "https://dict.youdao.com/dictvoice?audio=They+are+designing+a+modern+application&type=2",
+    audioUrl:
+      "https://dict.youdao.com/dictvoice?audio=They+are+designing+a+modern+application&type=2",
     hint: "برای فاعل جمع They از فعل کمکی are استفاده می‌شود.",
   },
 ];
@@ -59,8 +62,12 @@ function shuffleArray<T>(array: T[]): T[] {
  */
 function buildSentenceTokens(
   sentence: GrammarSentence,
-  autoShuffle: boolean
+  autoShuffle: boolean,
 ): GrammarToken[] {
+  if (sentence.publicTokens) {
+    const tokens = sentence.publicTokens.map((token) => ({ ...token }));
+    return autoShuffle ? shuffleArray(tokens) : tokens;
+  }
   const correctTokens: GrammarToken[] = sentence.tokens.map((text, idx) => ({
     id: `token-${sentence.id}-c-${idx}-${text}`,
     text,
@@ -74,7 +81,7 @@ function buildSentenceTokens(
       text,
       isDistractor: true,
       orderIndex: -1,
-    })
+    }),
   );
 
   const combined = [...correctTokens, ...distractorTokens];
@@ -97,6 +104,7 @@ function normalizeSentence(text: string): string {
  */
 export function useGrammarFsm({
   sentences = DEFAULT_GRAMMAR_SENTENCES,
+  evaluationMode = "local",
   initialSentenceIndex = 0,
   autoShuffleBank = true,
   successFeedbackMs = 900,
@@ -107,6 +115,9 @@ export function useGrammarFsm({
   onComplete,
   onStateChange,
 }: UseGrammarFsmOptions) {
+  const [deferredAnswers, setDeferredAnswers] = useState<
+    Record<string, string[]>
+  >({});
   // ۱. متغیرهای وضعیت (State Variables)
   const [currentSentenceIndex, setCurrentSentenceIndex] =
     useState<number>(initialSentenceIndex);
@@ -115,14 +126,12 @@ export function useGrammarFsm({
   const [allBankTokens, setAllBankTokens] = useState<GrammarToken[]>(() => {
     const initialSentence = sentences[initialSentenceIndex] || sentences[0];
     // رندر اولیه قطعی بدون شافل برای هماهنگی با SSR و پیشگیری از خطای Hydration Mismatch
-    return initialSentence
-      ? buildSentenceTokens(initialSentence, false)
-      : [];
+    return initialSentence ? buildSentenceTokens(initialSentence, false) : [];
   });
   const [isLocked, setIsLocked] = useState<boolean>(false);
   const [mistakeCount, setMistakeCount] = useState<number>(0);
   const [mistakenSentenceIds, setMistakenSentenceIds] = useState<Set<string>>(
-    new Set()
+    new Set(),
   );
 
   // مراجع تایمرها و پلیر صوتی
@@ -160,6 +169,7 @@ export function useGrammarFsm({
     setCurrentSentenceIndex(0);
     setAllBankTokens(buildSentenceTokens(initialSentence, autoShuffleBank));
     setSelectedTokens([]);
+    setDeferredAnswers({});
     setCardState("IDLE");
     setIsLocked(false);
     setMistakeCount(0);
@@ -174,7 +184,7 @@ export function useGrammarFsm({
         onStateChange(nextState);
       }
     },
-    [onStateChange]
+    [onStateChange],
   );
 
   // پخش ایمن فایل صوتی
@@ -197,7 +207,7 @@ export function useGrammarFsm({
         // نادیده‌گیری خطا در محیط‌های SSR یا فاقد خروجی صوت
       }
     },
-    [onAudioPlay]
+    [onAudioPlay],
   );
 
   // پخش صدای جمله فعال توسط کاربر
@@ -218,7 +228,7 @@ export function useGrammarFsm({
       setIsLocked(false);
       updateState("IDLE");
     },
-    [sentences, autoShuffleBank, updateState]
+    [sentences, autoShuffleBank, updateState],
   );
 
   // ۱. انتخاب توکن از مخزن و انتقال به خط جمله
@@ -249,7 +259,7 @@ export function useGrammarFsm({
         updateState("BUILDING");
       }
     },
-    [isLocked, cardState, selectedTokens, currentSentence, updateState]
+    [isLocked, cardState, selectedTokens, currentSentence, updateState],
   );
 
   // ۲. لمس توکن از خط جمله و بازگرداندن آن به مخزن
@@ -276,7 +286,7 @@ export function useGrammarFsm({
         updateState("BUILDING");
       }
     },
-    [isLocked, cardState, selectedTokens, currentSentence, updateState]
+    [isLocked, cardState, selectedTokens, currentSentence, updateState],
   );
 
   // ۳. اعتبارسنجی جمله در فاز CHECKING
@@ -294,13 +304,30 @@ export function useGrammarFsm({
     setIsLocked(true);
     updateState("CHECKING");
 
+    if (evaluationMode === "deferred") {
+      setDeferredAnswers((answers) => ({
+        ...answers,
+        [currentSentence.id]: selectedTokens.map((token) => token.id),
+      }));
+      updateState("ANSWER_RECORDED");
+      transitionTimerRef.current = setTimeout(() => {
+        setIsLocked(false);
+        if (currentSentenceIndex === sentences.length - 1)
+          updateState("COMPLETED");
+        else loadSentence(currentSentenceIndex + 1);
+      }, successFeedbackMs);
+      return;
+    }
     const builtSentence = selectedTokens.map((t) => t.text).join(" ");
     const normalizedBuilt = normalizeSentence(builtSentence);
     const normalizedTarget = normalizeSentence(currentSentence.targetSentence);
-    const normalizedTokens = normalizeSentence(currentSentence.tokens.join(" "));
+    const normalizedTokens = normalizeSentence(
+      currentSentence.tokens.join(" "),
+    );
 
     const isMatch =
-      normalizedBuilt === normalizedTarget || normalizedBuilt === normalizedTokens;
+      normalizedBuilt === normalizedTarget ||
+      normalizedBuilt === normalizedTokens;
 
     if (isMatch) {
       // شاخه موفقیت (SUCCESS)
@@ -365,6 +392,7 @@ export function useGrammarFsm({
       }, errorFeedbackMs);
     }
   }, [
+    evaluationMode,
     isLocked,
     cardState,
     currentSentence,
@@ -399,6 +427,7 @@ export function useGrammarFsm({
       activeAudioRef.current.pause();
     }
     setCurrentSentenceIndex(0);
+    setDeferredAnswers({});
     setMistakeCount(0);
     setMistakenSentenceIds(new Set());
     const firstSentence = sentences[0];
@@ -409,6 +438,48 @@ export function useGrammarFsm({
     setIsLocked(false);
     updateState("IDLE");
   }, [sentences, autoShuffleBank, updateState]);
+
+  const restoreDeferred = useCallback(
+    (draft: {
+      answers: Record<string, string[]>;
+      currentIndex: number;
+      selectedTokenIds: string[];
+    }) => {
+      if (evaluationMode !== "deferred") return;
+      for (const sentence of sentences) {
+        const ids = new Set(
+          (sentence.publicTokens ?? []).map((token) => token.id),
+        );
+        const answers = draft.answers[sentence.id] ?? [];
+        if (
+          answers.some((id) => !ids.has(id)) ||
+          new Set(answers).size !== answers.length
+        )
+          return;
+      }
+      const index = Math.max(
+        0,
+        Math.min(sentences.length - 1, draft.currentIndex),
+      );
+      const bank = buildSentenceTokens(sentences[index], autoShuffleBank);
+      const selected = draft.selectedTokenIds
+        .map((id) => bank.find((token) => token.id === id))
+        .filter((token): token is GrammarToken => Boolean(token));
+      setCurrentSentenceIndex(index);
+      setAllBankTokens(bank);
+      setSelectedTokens(selected);
+      setDeferredAnswers(draft.answers);
+      setIsLocked(false);
+      setCardState(
+        sentences.every((sentence) => draft.answers[sentence.id]?.length)
+          ? "COMPLETED"
+          : selected.length >= sentences[index].tokens.length
+            ? "READY_TO_CHECK"
+            : "IDLE",
+      );
+    },
+    [evaluationMode, sentences, autoShuffleBank],
+  );
 
   // محاسبه درصد پیشرفت کارت
   const progressPercentage = useMemo(() => {
@@ -421,6 +492,8 @@ export function useGrammarFsm({
   return {
     // متغیرهای وضعیت درخواستی FSM
     sentences,
+    deferredAnswers,
+    restoreDeferred,
     currentSentenceIndex,
     currentSentence,
     selectedTokens,

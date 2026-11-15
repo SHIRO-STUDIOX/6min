@@ -34,6 +34,8 @@ export type LessonVideoProps = {
   durationMs: number;
   persist?: boolean;
   onCredit?: () => void;
+  onInteract?: () => void;
+  demoOnly?: boolean;
 };
 
 export function LessonVideo(props: LessonVideoProps) {
@@ -54,6 +56,8 @@ function LessonVideoRuntime({
   durationMs,
   persist = false,
   onCredit,
+  onInteract,
+  demoOnly = true,
 }: LessonVideoProps) {
   const media = useRef<HTMLVideoElement | null>(null);
   const previous = useRef<PlaybackPoint | null>(null);
@@ -65,6 +69,7 @@ function LessonVideoRuntime({
   const sequence = useRef(0);
   const session = useRef<Session | null>(null);
   const lastFlush = useRef(0);
+  const notified = useRef(false);
   const notify = useRef(onCredit);
   notify.current = onCredit;
   const [coverage, setCoverage] = useState(0);
@@ -86,6 +91,7 @@ function LessonVideoRuntime({
         });
         if (cancelled) return;
         session.current = created;
+        notified.current = created.credited;
         setCoverage(created.coverage);
         setCredited(created.credited);
         setReady(true);
@@ -139,7 +145,10 @@ function LessonVideoRuntime({
         setCoverage(result.coverage);
         setCredited(result.credited);
         setError("");
-        if (result.credited) notify.current?.();
+        if (result.credited && !notified.current) {
+          notified.current = true;
+          notify.current?.();
+        }
       } catch (error) {
         setError(error instanceof Error ? error.message : "SYNC_FAILED");
       } finally {
@@ -186,9 +195,11 @@ function LessonVideoRuntime({
   return (
     <Card className="w-full max-w-xl p-4 gap-3">
       <Card.Header>
-        <Card.Title>ویدیوی آزمایشی — DEMO_ONLY</Card.Title>
+        <Card.Title>{demoOnly ? "ویدیوی آزمایشی" : "ویدیوی درس"}</Card.Title>
         <Card.Description>
-          کلیپ تست بی‌صدا؛ محتوای نهایی دوره نیست.
+          {demoOnly
+            ? "کلیپ تست بی‌صدا؛ محتوای نهایی دوره نیست."
+            : "پیشرفت مشاهده از پخش واقعی ثبت می‌شود."}
         </Card.Description>
       </Card.Header>
       <Card.Content>
@@ -209,6 +220,7 @@ function LessonVideoRuntime({
               media.current?.pause();
               return;
             }
+            if (!active.current) onInteract?.();
             active.current = true;
             previous.current = null;
             sample();

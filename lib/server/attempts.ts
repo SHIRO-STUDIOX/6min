@@ -171,6 +171,8 @@ export async function submitAttempt(
       );
     }
     const progression = await recomputeProgress(tx, subject.id, body.lessonId);
+    await tx.execute(sql`INSERT INTO last_activity(subject_id,lesson_id,stage_id,source_route) VALUES (${subject.id},${body.lessonId},${body.stageId},${"/classroom/" + encodeURIComponent(body.lessonId)})
+      ON CONFLICT(subject_id) DO UPDATE SET lesson_id=excluded.lesson_id,stage_id=excluded.stage_id,source_route=excluded.source_route,updated_at=now()`);
     const outcome: AttemptOutcome = {
       ...progression,
       attemptId,

@@ -314,6 +314,9 @@ export async function importGuest(
     await tx.execute(sql`INSERT INTO last_activity(subject_id,lesson_id,stage_id,draft_id,source_route,scroll_state,updated_at)
       SELECT ${userId},lesson_id,stage_id,draft_id,source_route,scroll_state,updated_at FROM last_activity WHERE subject_id=${guestId}
       ON CONFLICT(subject_id) DO UPDATE SET lesson_id=excluded.lesson_id,stage_id=excluded.stage_id,draft_id=excluded.draft_id,source_route=excluded.source_route,scroll_state=excluded.scroll_state,updated_at=excluded.updated_at WHERE last_activity.updated_at<excluded.updated_at`);
+    await tx.execute(sql`INSERT INTO selected_context(subject_id,lesson_id,stage_id,updated_at)
+      SELECT ${userId},lesson_id,stage_id,updated_at FROM selected_context WHERE subject_id=${guestId}
+      ON CONFLICT(subject_id) DO UPDATE SET lesson_id=excluded.lesson_id,stage_id=excluded.stage_id,updated_at=excluded.updated_at WHERE selected_context.updated_at<excluded.updated_at`);
     const summary: Summary = {
       importId,
       importedAttempts,

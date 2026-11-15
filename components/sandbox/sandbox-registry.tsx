@@ -1,4 +1,7 @@
 import React from "react";
+import LegacyClassroom from "./legacy-classroom";
+import { AppFrame } from "@/components/templates/app-frame";
+import { LessonExercise } from "@/components/organisms/lesson-exercise";
 import { AuthPanel } from "@/components/organisms/auth-panel";
 import { GuestDraftField } from "@/components/molecules/guest-draft-field";
 import { LessonVideo } from "@/components/organisms/lesson-video";
@@ -15,6 +18,9 @@ import { CompletionCard } from "@/components/organisms/completion-card";
 import { StageIndicator } from "@/components/molecules/StageIndicator";
 
 export const sandboxRegistry: SandboxComponent[] = [
+  { id: "app-frame", name: "AppFrame", persianName: "پوسته کلاس و ناوبری", category: "organisms", description: "هدر سه جزیره و داک سه مقصدی؛ بدون داده آموزشی نمونه عملیاتی.", filePath: "components/templates/app-frame.tsx", dependencies: ["@heroui/react"], defaultProps: {}, propDefinitions: [], render: () => <AppFrame><p className="p-6">پیش‌نمایش پوسته کلاس</p></AppFrame> },
+  { id: "lesson-exercise", name: "LessonExercise", persianName: "تمرین متصل به FSM (پیش‌نمایش)", category: "organisms", description: "گزینه‌های عمومی؛ بدون نمره‌دهی یا ارسال تلاش در Sandbox.", filePath: "components/organisms/lesson-exercise.tsx", dependencies: ["@heroui/react", "useVocabularyFsm"], defaultProps: {}, propDefinitions: [], render: () => <LessonExercise model={null} lessonId="sandbox" revisionId="sandbox-v1" stage={{ id:"sandbox-matching",order:1,kind:"exercise",exerciseKind:"vocabulary-match",activityLocked:false,questions:[{id:"q1",revision:1,prompt:"Hallo",options:[{id:"a",text:"سلام"},{id:"b",text:"خداحافظ"}]},{id:"q2",revision:1,prompt:"Tschüss",options:[{id:"a",text:"سلام"},{id:"b",text:"خداحافظ"}]}]}} /> },
+  { id: "legacy-classroom", name: "LegacyClassroom", persianName: "نمونه قدیمی کلاس (آرشیو Sandbox)", category: "organisms", description: "نمونه اولیه حفظ‌شده؛ امتیاز و پلیر آن عملیاتی نیست.", filePath: "components/sandbox/legacy-classroom.tsx", dependencies: ["Existing prototype cards"], defaultProps: {}, propDefinitions: [], render: () => <LegacyClassroom /> },
   {
     id: "auth-panel", name: "AuthPanel", persianName: "ورود و بازیابی (پیش‌نمایش بدون ارسال)", category: "organisms",
     description: "ورود با کامپوننت‌های موجود؛ پیش‌نمایش بدون ورود، ارسال پیامک یا تماس با دیتابیس.",

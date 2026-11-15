@@ -6,6 +6,7 @@ export type GrammarCardState =
   | "BUILDING"
   | "READY_TO_CHECK"
   | "CHECKING"
+  | "ANSWER_RECORDED"
   | "SUCCESS"
   | "ERROR"
   | "COMPLETED";
@@ -25,6 +26,8 @@ export interface GrammarToken {
  * ساختار هر تمرین جمله‌سازی در کارت گرامر
  */
 export interface GrammarSentence {
+  /** Unordered public token identities for deferred server assessment. */
+  publicTokens?: { id: string; text: string }[];
   id: string;
   /** جمله صحیح و نهایی به انگلیسی */
   targetSentence: string;
@@ -57,6 +60,7 @@ export interface GrammarResult {
  * تنظیمات و پراپ‌های هوک useGrammarFsm
  */
 export interface UseGrammarFsmOptions {
+  evaluationMode?: "local" | "deferred";
   sentences: GrammarSentence[];
   initialSentenceIndex?: number;
   autoShuffleBank?: boolean;

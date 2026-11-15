@@ -146,6 +146,10 @@ export async function updateWatch(
     await tx.execute(sql`INSERT INTO lesson_progress(subject_id,lesson_id,video_credited,current_revision,last_activity_at,unlocked_at)
       VALUES (${subject.id},${session.lesson_id as string},${credited},${session.revision_id as string},now(),CASE WHEN ${session.lesson_id as string}='de-01' THEN now() ELSE NULL END)
       ON CONFLICT(subject_id,lesson_id) DO UPDATE SET video_credited=lesson_progress.video_credited OR excluded.video_credited,last_activity_at=now()`);
+    if (incoming.length || body.lastPositionMs > 0)
+      await tx.execute(sql`INSERT INTO last_activity(subject_id,lesson_id,stage_id,source_route)
+      SELECT ${subject.id},${session.lesson_id as string},id,${"/classroom/" + encodeURIComponent(session.lesson_id as string)} FROM stages WHERE revision_id=${session.revision_id as string} AND kind='video' ORDER BY stage_order LIMIT 1
+      ON CONFLICT(subject_id) DO UPDATE SET lesson_id=excluded.lesson_id,stage_id=excluded.stage_id,source_route=excluded.source_route,updated_at=now()`);
     const progression = await recomputeProgress(
       tx,
       subject.id,

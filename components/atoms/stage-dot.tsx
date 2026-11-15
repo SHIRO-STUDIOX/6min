@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { Button } from "@heroui/react";
 
 export type StepVisualStatus =
   | "upcoming"
@@ -52,7 +53,7 @@ export function StageDot({
   }
 
   // نمایش حلقه خنثی با افست مشخص برای نشان دادن فوکوس زنده کاربر یا مرور کارت حل‌شده
-  const showRing = isActive || status === "active";
+  const showRing = isActive;
 
   const defaultLabel =
     ariaLabel ||
@@ -69,15 +70,17 @@ export function StageDot({
     }`;
 
   return (
-    <button
+    <Button
+      isIconOnly
+      variant="ghost"
       type="button"
-      onClick={isClickable ? onClick : undefined}
-      disabled={!isClickable}
+      onPress={isClickable ? onClick : undefined}
+      isDisabled={!isClickable}
       aria-label={defaultLabel}
-      aria-current={isActive || status === "active" ? "step" : undefined}
-      className={`relative inline-flex items-center justify-center size-1.5 p-0 border-0 bg-transparent shrink-0 focus-visible:outline-none transition-all duration-200 ${
+      aria-current={isActive ? "step" : undefined}
+      className={`relative inline-flex items-center justify-center size-10 min-w-10 p-0 border-0 bg-transparent shrink-0 focus-visible:outline-none transition-all duration-200 ${
         isClickable
-          ? "cursor-pointer before:absolute before:-inset-2 before:content-[''] opacity-100 hover:opacity-80"
+          ? "cursor-pointer opacity-100 hover:opacity-80"
           : "cursor-default pointer-events-none"
       } ${className}`}
     >
@@ -90,9 +93,9 @@ export function StageDot({
       {showRing && (
         <span
           aria-hidden="true"
-          className="absolute -inset-[2.5px] rounded-full border border-white/40 dark:border-white/50 pointer-events-none transition-all duration-200 ease-out animate-in fade-in"
+          className="absolute size-[11px] rounded-full border border-white/40 dark:border-white/50 pointer-events-none transition-all duration-200 ease-out animate-in fade-in"
         />
       )}
-    </button>
+    </Button>
   );
 }

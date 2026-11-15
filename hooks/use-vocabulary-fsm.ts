@@ -105,11 +105,15 @@ export function useVocabularyFsm({
   const [cardState, setCardState] = useState<VocabularyCardState>("IDLE");
   const [selectedSourceId, setSelectedSourceId] = useState<string | null>(null);
   const [selectedTargetId, setSelectedTargetId] = useState<string | null>(null);
-  const [deferredAnswers, setDeferredAnswers] = useState<VocabularySelection[]>([]);
+  const [deferredAnswers, setDeferredAnswers] = useState<VocabularySelection[]>(
+    [],
+  );
   const [matchedIds, setMatchedIds] = useState<Set<string>>(new Set());
   const [isLocked, setIsLocked] = useState<boolean>(false);
   const [mistakeCount, setMistakeCount] = useState<number>(0);
-  const [mistakenPairIds, setMistakenPairIds] = useState<Set<string>>(new Set());
+  const [mistakenPairIds, setMistakenPairIds] = useState<Set<string>>(
+    new Set(),
+  );
 
   // مرجع تایمرهای ترنزیشن
   const transitionTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -196,7 +200,7 @@ export function useVocabularyFsm({
         // نادیده‌گیری خطای صدا در محیط‌های بدون کارت صدا یا SSR
       }
     },
-    [onAudioPlay]
+    [onAudioPlay],
   );
 
   // تغییر وضعیت همراه با اطلاع‌رسانی
@@ -207,7 +211,7 @@ export function useVocabularyFsm({
         onStateChange(nextState);
       }
     },
-    [onStateChange]
+    [onStateChange],
   );
 
   // محاسبه پیشرفت کارت
@@ -264,7 +268,7 @@ export function useVocabularyFsm({
             // ارسال رویداد اتمام همراه با خروجی عملکرد
             if (onComplete) {
               const mistakenPairs = pairs.filter((p) =>
-                mistakenPairIds.has(p.id)
+                mistakenPairIds.has(p.id),
               );
               const totalAttempts = pairs.length + mistakeCount;
               const accuracy =
@@ -317,7 +321,7 @@ export function useVocabularyFsm({
       errorFeedbackMs,
       updateState,
       onComplete,
-    ]
+    ],
   );
 
   // انتخاب آیتم توسط کاربر
@@ -336,7 +340,11 @@ export function useVocabularyFsm({
       // بررسی اینکه آیا جفت قبلاً مچ شده است
       if (evaluationMode === "deferred") {
         if (column === "source" && matchedIds.has(item.pairId)) return;
-        if (column === "target" && deferredAnswers.some((answer) => answer.targetId === item.id)) return;
+        if (
+          column === "target" &&
+          deferredAnswers.some((answer) => answer.targetId === item.id)
+        )
+          return;
       } else if (matchedIds.has(item.pairId)) return;
 
       // پخش صدای آیتم در صورت وجود
@@ -392,7 +400,7 @@ export function useVocabularyFsm({
       playAudio,
       updateState,
       evaluateMatch,
-    ]
+    ],
   );
 
   // بازنشانی کامل کارت
@@ -419,7 +427,40 @@ export function useVocabularyFsm({
     updateState("IDLE");
   }, [pairs, autoShuffleTarget, updateState]);
 
+  const restoreDeferred = useCallback(
+    (answers: VocabularySelection[]) => {
+      if (
+        evaluationMode !== "deferred" ||
+        answers.some(
+          (answer) =>
+            !sourceItems.some((item) => item.id === answer.sourceId) ||
+            !targetItems.some((item) => item.id === answer.targetId),
+        ) ||
+        new Set(answers.map((answer) => answer.sourceId)).size !==
+          answers.length ||
+        new Set(answers.map((answer) => answer.targetId)).size !==
+          answers.length
+      )
+        return;
+      setDeferredAnswers(answers);
+      setMatchedIds(
+        new Set(
+          answers.map(
+            (answer) =>
+              sourceItems.find((item) => item.id === answer.sourceId)!.pairId,
+          ),
+        ),
+      );
+      setSelectedSourceId(null);
+      setSelectedTargetId(null);
+      setIsLocked(false);
+      setCardState(answers.length === pairs.length ? "COMPLETED" : "IDLE");
+    },
+    [evaluationMode, sourceItems, targetItems, pairs.length],
+  );
+
   return {
+    restoreDeferred,
     cardState,
     deferredAnswers,
     sourceItems,
@@ -431,7 +472,9 @@ export function useVocabularyFsm({
     mistakeCount,
     mistakenPairIds,
     progressPercentage,
-    isCompleted: cardState === "COMPLETED" || (pairs.length > 0 && matchedIds.size === pairs.length),
+    isCompleted:
+      cardState === "COMPLETED" ||
+      (pairs.length > 0 && matchedIds.size === pairs.length),
     selectItem,
     reset,
     playAudio,

@@ -21,19 +21,10 @@ export function StageIndicator({
     const isActive = index === currentIndex;
 
     // تفکیک وضعیت نهایی بصری و تعیین وضعیت فعال / مرور فعال (Active Review)
-    let visualStatus: StepVisualStatus = rawStatus;
-    if (rawStatus === "upcoming") {
-      visualStatus = isActive ? "active" : "upcoming";
-    }
+    const visualStatus: StepVisualStatus = rawStatus;
 
-    // بررسی تکمیل بودن مرحله (موفقیت، هشدار، خطا)
-    const isCompleted =
-      rawStatus === "success" ||
-      rawStatus === "warning" ||
-      rawStatus === "danger";
-
-    // مراحل تکمیل‌شده در صورت وجود کال‌بک، قابلیت کلیک و ناوبری دریافت می‌کنند
-    const isClickable = Boolean(onStepClick && isCompleted);
+    // انتخاب مرحله از مجاز بودن فعالیت آن مستقل است.
+    const isClickable = Boolean(onStepClick);
 
     return {
       index,
@@ -53,6 +44,7 @@ export function StageIndicator({
         <StageDot
           key={step.index}
           index={step.index}
+          ariaLabel={`کارت ${step.index + 1}: ${step.rawStatus === "upcoming" ? "فعالیت قفل؛ انتخاب کارت مجاز" : step.rawStatus === "success" ? "تکمیل‌شده" : step.rawStatus === "warning" ? "نیازمند مرور" : "آماده تمرین"}${step.isActive ? "؛ انتخاب‌شده" : ""}`}
           status={step.visualStatus}
           isActive={step.isActive}
           isClickable={step.isClickable}
