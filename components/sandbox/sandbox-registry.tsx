@@ -1,4 +1,5 @@
 import React from "react";
+import { LessonVideo } from "@/components/organisms/lesson-video";
 import { SandboxComponent } from "./sandbox-types";
 import { FloatingHeader } from "@/components/organisms/floating-header";
 import { PhoneLogin } from "@/components/organisms/phone-login";
@@ -12,6 +13,13 @@ import { CompletionCard } from "@/components/organisms/completion-card";
 import { StageIndicator } from "@/components/molecules/StageIndicator";
 
 export const sandboxRegistry: SandboxComponent[] = [
+  {
+    id: "lesson-video", name: "LessonVideo", persianName: "پخش واقعی ویدیو (پیش‌نمایش بدون دیتابیس)", category: "organisms",
+    description: "پخش‌کننده آماده با کنترل بومی و زیرنویس؛ نمونه آزمایشی بدون ثبت امتیاز.",
+    filePath: "components/organisms/lesson-video.tsx", dependencies: ["react-player", "@heroui/react Card"],
+    defaultProps: {}, propDefinitions: [],
+    render: () => <LessonVideo lessonId="de-01" revisionId="de-01-v1" assetId="de-01-video" src="/demo/synthetic.mp4" captionsUrl="/demo/synthetic.vtt" durationMs={10000} />,
+  },
   // ==========================================
   // ORGANISMS
   // ==========================================

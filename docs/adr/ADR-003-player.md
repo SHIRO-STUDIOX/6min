@@ -1,0 +1,7 @@
+# ADR-003 — Existing media package and credit telemetry
+
+Context: DEC-006/023 forbid timer credit and a bespoke video engine. Options: Vidstack UI suite or ReactPlayer wrapper with browser-native controls. Decision: ReactPlayer 3.3.3 (React 19 peer support verified), local HTML5 file with native accessible controls/captions/fullscreen; no custom playback controls. Prototype VideoPlayer stays Sandbox-only. Component is registered in Sandbox before use in a development-only playback harness. Mobile physical-device testing remains a release/QC check, not claimed by headless Chromium.
+
+Only actual media events + monotonic elapsed time produce intervals. Seek/buffer/pause reset sampling; position is separate from unique coverage. Server validates ownership, revision, duration, monotonically increasing sequence and elapsed-time plausibility (at most 2x plus small event tolerance). Subject-scoped transaction merges all sessions' ranges, persists credit once and resume position. Server recomputation cannot prove a human watched: a patient malicious client can fabricate plausible telemetry. No absolute anti-cheat claim.
+
+One in-flight queue retains failed payload/sequence for explicit retry. Browser close may lose the final unsent fraction; previously acknowledged ranges are durable and never duplicated. No penalty for tab change. Production media, target iOS/browser behavior and final visuals remain separate gates. Rollback component/API without deleting saved watch history. Approval: reversible engineering decision under owner's continuous authorization.
