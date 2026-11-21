@@ -88,7 +88,7 @@ export function SandboxHeader() {
   const isDark = resolvedTheme === "dark";
 
   return (
-    <header className="h-14 w-full px-4 border-b border-default-200/70 bg-background/80 backdrop-blur-xl flex items-center justify-between gap-4 z-40 select-none shrink-0">
+    <header className="h-14 w-full overflow-x-auto px-4 border-b border-default-200/70 bg-background/80 backdrop-blur-xl flex items-center justify-between gap-4 z-40 select-none shrink-0">
       {/* 1. بخش راست: لوگو و نام کامپوننت انتخابی */}
       <div className="flex items-center gap-3 min-w-[240px]">
         <Link

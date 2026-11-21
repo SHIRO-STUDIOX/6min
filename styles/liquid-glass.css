@@ -1,0 +1,55 @@
+/* The HeroUI button remains the interactive element and owns its focus ring. */
+.liquid-button {
+  background-color: color-mix(in oklch, var(--button-bg) 44%, transparent);
+}
+.liquid-button:hover,
+.liquid-button[data-hovered="true"] {
+  background-color: color-mix(in oklch, var(--button-bg-hover) 55%, transparent);
+}
+.liquid-button:active,
+.liquid-button[data-pressed="true"] {
+  background-color: color-mix(in oklch, var(--button-bg-pressed) 65%, transparent);
+}
+.liquid-layer {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+.liquid-button .liquid-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  margin: 0;
+  overflow: hidden;
+}
+.liquid-warp,
+.liquid-rim {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+.liquid-warp {
+  backdrop-filter: blur(var(--liquid-blur)) saturate(var(--liquid-saturation));
+  transform: translate(var(--liquid-tilt-x, 0), var(--liquid-tilt-y, 0));
+}
+.liquid-button[data-liquid-quality="full"] .liquid-warp {
+  filter: var(--liquid-filter);
+}
+.liquid-rim {
+  border: 1px solid color-mix(in srgb, white 35%, transparent);
+  box-shadow: inset 0 1px 2px color-mix(in srgb, white 50%, transparent), inset 0 -1px 2px color-mix(in srgb, black 12%, transparent);
+  background: linear-gradient(calc(135deg + var(--liquid-x, 0) * 1.2deg), color-mix(in srgb, white 26%, transparent), transparent 45%, color-mix(in srgb, white 8%, transparent));
+}
+.liquid-content { position: relative; z-index: 1; display: inline-flex; align-items: center; justify-content: center; gap: inherit; }
+.liquid-button[data-liquid-quality="light"] .liquid-warp { backdrop-filter: blur(4px); }
+.liquid-button[data-liquid-quality="simple"] .liquid-warp { display: none; }
+.liquid-button[data-liquid-quality="simple"] { background-color: var(--button-bg); }
+@supports not (backdrop-filter: blur(1px)) {
+  .liquid-button { background-color: var(--button-bg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .liquid-warp { transform: none; }
+}

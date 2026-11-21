@@ -39,6 +39,7 @@
 | `04-experience/app-shell-and-navigation.md` | رفتار Header، Action Center و Dock | API |
 | `04-experience/screen-flows.md` | مسیرهای کاربر و رفتار صفحه‌ها | Navigation, Learning |
 | `04-experience/design-guardrails-and-qc.md` | مرز استاندارد UI و مسائل باز QC | Audit |
+| `04-experience/liquid-glass-components.md` | قرارداد آزمایشی کامپوننت‌های Liquid Glass و بودجهٔ عملکرد | Design guardrails, HeroUI |
 | `05-delivery/implementation-slices.md` | ترتیب PR/برش‌های عمودی و Definition of Done | تمام قراردادها |
 | `05-delivery/verification-and-recovery.md` | تست‌های پذیرش، خطا و بازیابی | تمام قراردادها |
 | `05-delivery/agent-handoff.md` | شیوه واگذاری تغییر به ایجنت | Delivery |

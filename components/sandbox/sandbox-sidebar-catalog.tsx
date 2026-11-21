@@ -54,7 +54,7 @@ export function SandboxSidebarCatalog() {
   }, []);
 
   return (
-    <aside className="w-80 h-full border-l border-default-200/70 bg-background/95 backdrop-blur-xl flex flex-col shrink-0 select-none z-30 overflow-hidden">
+    <aside className="w-full h-full border-l border-default-200/70 bg-background/95 backdrop-blur-xl flex flex-col shrink-0 select-none z-30 overflow-hidden">
       {/* 1. سربرگ کاتالوگ و سرچ */}
       <div className="p-3.5 border-b border-default-200/60 flex flex-col gap-3">
         <div className="flex items-center justify-between">

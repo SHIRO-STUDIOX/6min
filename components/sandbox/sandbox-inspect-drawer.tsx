@@ -31,10 +31,15 @@ export function SandboxInspectDrawer() {
 
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
-  const handleCopy = (text: string, key: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedKey(key);
-    setTimeout(() => setCopiedKey(null), 2000);
+  const handleCopy = async (text: string, key: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedKey(key);
+      setTimeout(() => setCopiedKey(null), 2000);
+    } catch {
+      setCopiedKey("error");
+      setTimeout(() => setCopiedKey(null), 2000);
+    }
   };
 
   // Generate live code snippet
@@ -176,7 +181,7 @@ export function SandboxInspectDrawer() {
             className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-accent/15 hover:bg-accent/25 text-accent text-xs font-bold transition-colors cursor-pointer"
             title="کپی کامل کد JSX کامپوننت با پراپ‌های جاری"
           >
-            {copiedKey === "code" ? (
+            {copiedKey === "error" ? <span className="text-[11px]">کپی ناموفق؛ متن را انتخاب کنید</span> : copiedKey === "code" ? (
               <>
                 <Check className="size-3.5 text-success" />
                 <span className="text-success text-[11px]">کد کپی شد!</span>

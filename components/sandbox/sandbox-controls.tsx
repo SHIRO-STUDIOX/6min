@@ -34,6 +34,8 @@ const persianPresets = [
 ];
 
 export function SandboxControls() {
+  const [jsonText, setJsonText] = React.useState("");
+  const [jsonMessage, setJsonMessage] = React.useState("");
   const {
     selectedComponent,
     componentProps,
@@ -45,7 +47,7 @@ export function SandboxControls() {
   const { propDefinitions, presets } = selectedComponent;
 
   return (
-    <aside className="w-80 h-full border-r border-default-200/70 bg-background/95 backdrop-blur-xl flex flex-col shrink-0 select-none z-30 overflow-hidden">
+    <aside className="w-full h-full border-r border-default-200/70 bg-background/95 backdrop-blur-xl flex flex-col shrink-0 select-none z-30 overflow-hidden">
       {/* 1. سربرگ پنل کنترل */}
       <div className="p-3.5 border-b border-default-200/60 flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -85,6 +87,34 @@ export function SandboxControls() {
 
       {/* 3. لیست کنترل‌های داینامیک */}
       <div className="flex-1 overflow-y-auto p-3.5 flex flex-col gap-4">
+        {selectedComponent.id === "liquid-button" && (
+          <div className="p-3 rounded-2xl bg-default-50/70 border border-default-200/60 flex flex-col gap-2">
+            <span className="text-xs font-bold">ذخیره و بازیابی تنظیمات</span>
+            <div className="flex gap-2 flex-wrap">
+              <Button size="sm" variant="secondary" onPress={() => { setJsonText(JSON.stringify(componentProps, null, 2)); setJsonMessage("JSON آماده است."); }}>ساخت JSON</Button>
+              <Button size="sm" variant="secondary" onPress={() => {
+                try {
+                  const parsed: unknown = JSON.parse(jsonText);
+                  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error();
+                  const valid: Record<string, unknown> = {};
+                  for (const def of propDefinitions) {
+                    const value = (parsed as Record<string, unknown>)[def.name];
+                    if (value === undefined) continue;
+                    if (def.type === "number" && typeof value === "number" && Number.isFinite(value) && value >= (def.min ?? -Infinity) && value <= (def.max ?? Infinity)) valid[def.name] = value;
+                    else if (def.type === "boolean" && typeof value === "boolean") valid[def.name] = value;
+                    else if (def.type === "string" && typeof value === "string") valid[def.name] = value;
+                    else if (def.type === "select" && def.options?.some((option) => option.value === value)) valid[def.name] = value;
+                    else throw new Error();
+                  }
+                  applyPreset(valid);
+                  setJsonMessage("تنظیمات اعمال شد.");
+                } catch { setJsonMessage("JSON یا مقدار پراپ نامعتبر است."); }
+              }}>اعمال JSON</Button>
+            </div>
+            <textarea aria-label="تنظیمات JSON" dir="ltr" value={jsonText} onChange={(event) => setJsonText(event.target.value)} rows={4} className="w-full rounded-lg border border-default-200 bg-background p-2 font-mono text-xs" />
+            <span role="status" className="text-xs text-muted">{jsonMessage}</span>
+          </div>
+        )}
         {propDefinitions.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-6 text-center gap-3 my-auto bg-default-50 rounded-2xl border border-default-200/60 text-muted">
             <div className="p-3 rounded-2xl bg-accent/10 text-accent">
@@ -190,9 +220,20 @@ export function SandboxControls() {
                       onChange={(e) => updateProp(propDef.name, Number(e.target.value))}
                       className="flex-1 accent-accent"
                     />
-                    <span className="text-xs font-bold font-tabular min-w-[32px] text-center">
-                      {currentValue}
-                    </span>
+                    <input
+                      type="number"
+                      aria-label={propDef.label}
+                      min={propDef.min}
+                      max={propDef.max}
+                      step={propDef.step ?? 1}
+                      value={Number(currentValue) || 0}
+                      onChange={(event) => {
+                        if (event.target.value === "") return;
+                        const value = Number(event.target.value);
+                        if (Number.isFinite(value)) updateProp(propDef.name, Math.max(propDef.min ?? -Infinity, Math.min(propDef.max ?? Infinity, value)));
+                      }}
+                      className="w-20 rounded-lg border border-default-200 bg-background px-2 py-1 text-xs font-tabular"
+                    />
                   </div>
                 )}
 

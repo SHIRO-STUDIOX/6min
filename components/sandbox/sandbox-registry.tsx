@@ -21,8 +21,60 @@ import { DictationCard } from "@/components/organisms/dictation-card";
 import { PronunciationCard } from "@/components/organisms/pronunciation-card";
 import { CompletionCard } from "@/components/organisms/completion-card";
 import { StageIndicator } from "@/components/molecules/StageIndicator";
+import { LiquidButtonPreview, type LiquidPreviewProps } from "./liquid-button-preview";
 
 export const sandboxRegistry: SandboxComponent[] = [
+  {
+    id: "liquid-button", name: "LiquidButton", persianName: "دکمه لیکویید گلس",
+    category: "heroui", description: "دکمه HeroUI با پراپ‌های افکت مرجع و بودجه عملکرد خودکار.",
+    filePath: "components/liquid-glass/liquid-button.tsx", dependencies: ["@heroui/react"],
+    defaultViewport: "mobile",
+    defaultProps: { label: "ادامه مسیر", variant: "secondary", size: "md", displacementScale: 70, blurAmount: 0.0625, saturation: 140, aberrationIntensity: 2, elasticity: 0.15, cornerRadius: 24, padding: "", overLight: false, mode: "standard", performance: "auto", background: "gradient", sampleCount: 1, trackScene: false, compareReference: false, manualPosition: false, mouseX: 0, mouseY: 0, offsetX: 0, offsetY: 0, isDisabled: false, isPending: false },
+    propDefinitions: [
+      { name: "label", label: "متن دکمه", type: "string", defaultValue: "ادامه مسیر" },
+      { name: "variant", label: "نوع HeroUI", type: "select", defaultValue: "secondary", options: ["primary", "secondary", "tertiary", "outline", "ghost", "danger", "danger-soft"].map((value) => ({ label: value, value })) },
+      { name: "size", label: "اندازه", type: "select", defaultValue: "md", options: ["sm", "md", "lg"].map((value) => ({ label: value, value })) },
+      { name: "displacementScale", label: "شدت شکست", type: "number", min: 0, max: 150, step: 1, defaultValue: 70 },
+      { name: "blurAmount", label: "تاری", type: "number", min: 0, max: 1, step: 0.0125, defaultValue: 0.0625, description: "فرمول مرجع: ۴ یا ۱۲ به‌علاوه مقدار × ۳۲ پیکسل." },
+      { name: "saturation", label: "اشباع رنگ", type: "number", min: 0, max: 250, step: 5, defaultValue: 140 },
+      { name: "aberrationIntensity", label: "جدایی رنگ لبه", type: "number", min: 0, max: 8, step: 0.1, defaultValue: 2 },
+      { name: "elasticity", label: "حرکت شیشه", type: "number", min: 0, max: 1, step: 0.05, defaultValue: 0.15 },
+      { name: "cornerRadius", label: "شعاع گوشه (px)", type: "number", min: 0, max: 100, step: 1, defaultValue: 24 },
+      { name: "padding", label: "فاصله داخلی CSS", type: "string", defaultValue: "", placeholder: "مانند 8px 16px؛ خالی یعنی HeroUI" },
+      { name: "overLight", label: "روی زمینه روشن", type: "boolean", defaultValue: false },
+      { name: "mode", label: "روش شکست", type: "select", defaultValue: "standard", options: ["standard", "polar", "prominent", "shader"].map((value) => ({ label: value, value })) },
+      { name: "performance", label: "کیفیت", type: "select", defaultValue: "auto", options: ["auto", "full", "balanced", "light", "simple"].map((value) => ({ label: value, value })) },
+      { name: "background", label: "زمینه پیش‌نمایش", type: "select", defaultValue: "gradient", options: ["gradient", "light", "dark", "grid", "video"].map((value) => ({ label: value, value })) },
+      { name: "sampleCount", label: "تعداد نمونه‌ها", type: "number", min: 1, max: 12, step: 1, defaultValue: 1 },
+      { name: "trackScene", label: "ردیابی ماوس در صحنه", type: "boolean", defaultValue: false },
+      { name: "compareReference", label: "نمایش نسخه مرجع", type: "boolean", defaultValue: false, description: "برای مقایسهٔ بصری از کیفیت کامل استفاده کنید؛ ابعاد و فونت مرجع مستقل‌اند." },
+      { name: "manualPosition", label: "مختصات دستی ماوس", type: "boolean", defaultValue: false },
+      { name: "mouseX", label: "globalMousePos.x", type: "number", min: 0, max: 2000, step: 1, defaultValue: 0 },
+      { name: "mouseY", label: "globalMousePos.y", type: "number", min: 0, max: 2000, step: 1, defaultValue: 0 },
+      { name: "offsetX", label: "mouseOffset.x", type: "number", min: -100, max: 100, step: 1, defaultValue: 0 },
+      { name: "offsetY", label: "mouseOffset.y", type: "number", min: -100, max: 100, step: 1, defaultValue: 0 },
+      { name: "isDisabled", label: "غیرفعال", type: "boolean", defaultValue: false },
+      { name: "isPending", label: "در حال انجام", type: "boolean", defaultValue: false },
+    ],
+    presets: [
+      { name: "reference", label: "نمونه مرجع", props: { displacementScale: 64, blurAmount: 0.1, saturation: 130, aberrationIntensity: 2, elasticity: 0.35, cornerRadius: 100, padding: "8px 16px", performance: "full" } },
+      { name: "safe", label: "سبک", props: { performance: "light", elasticity: 0 } },
+    ],
+    render: (props) => <LiquidButtonPreview {...(props as LiquidPreviewProps)} padding={props.padding || undefined} />,
+    getCodeSnippet: (props) => {
+      const names = ["variant", "size", "displacementScale", "blurAmount", "saturation", "aberrationIntensity", "elasticity", "cornerRadius", "padding", "overLight", "mode", "performance", "isDisabled", "isPending"];
+      const attributes = names.filter((name) => props[name] !== undefined && props[name] !== "").map((name) => `      ${name}={${JSON.stringify(props[name])}}`);
+      if (props.trackScene) attributes.push("      mouseContainer={sceneRef}");
+      if (props.manualPosition) {
+        attributes.push(`      globalMousePos={{ x: ${Number(props.mouseX) || 0}, y: ${Number(props.mouseY) || 0} }}`);
+        attributes.push(`      mouseOffset={{ x: ${Number(props.offsetX) || 0}, y: ${Number(props.offsetY) || 0} }}`);
+      }
+      const button = `    <LiquidButton\n${attributes.join("\n")}\n    >\n      {${JSON.stringify(props.label ?? "ادامه مسیر")}}\n    </LiquidButton>`;
+      const content = props.trackScene ? `    <div ref={sceneRef}>\n  ${button}\n    </div>` : button;
+      return `"use client";\n${props.trackScene ? 'import { useRef } from "react";\n' : ""}import { LiquidButton } from "@/components/liquid-glass/liquid-button";\n\nexport function Example() {\n${props.trackScene ? "  const sceneRef = useRef<HTMLDivElement>(null);\n" : ""}  return (\n${content}\n  );\n}`;
+    },
+    tags: ["HeroUI", "Liquid Glass", "Button"],
+  },
   {
     id: "my-path",
     name: "MyPath",
