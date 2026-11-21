@@ -41,6 +41,8 @@ export interface BaseCardProps {
   onNext?: () => void;
   /** کلاس‌های اختیاری Tailwind جهت افزودن استایل */
   className?: string;
+  /** Scroll the live lesson body while keeping the dev card frame fixed. */
+  scrollContent?: boolean;
 }
 
 /**
@@ -65,6 +67,7 @@ export function BaseCard({
   nextButtonText = "کارت بعدی",
   onNext,
   className = "",
+  scrollContent = false,
 }: BaseCardProps) {
   const clampedProgress = Math.min(100, Math.max(0, progressPercentage));
 
@@ -97,7 +100,14 @@ export function BaseCard({
       {/* ======================================================== */}
       {/* ۲. بدنه محتوایی کارت (Injected Content Area) */}
       {/* ======================================================== */}
-      <Card.Content className="p-0 my-auto w-full flex flex-col justify-center relative">
+      <Card.Content
+        className={
+          scrollContent
+            ? "p-0 my-3 w-full min-h-0 flex-1 overflow-y-auto relative"
+            : "p-0 my-auto w-full flex flex-col justify-center relative"
+        }
+        data-app-scroll={scrollContent || undefined}
+      >
         {children}
 
         {/* لایه قفل سراسری کارت در صورت فعال بودن isLocked عمومی */}
@@ -106,7 +116,9 @@ export function BaseCard({
             <div className="size-10 rounded-full bg-surface-secondary border border-separator flex items-center justify-center text-muted mb-2">
               <LockIcon className="size-5" />
             </div>
-            <span className="text-xs font-bold text-foreground mb-1">جلسه قفل است</span>
+            <span className="text-xs font-bold text-foreground mb-1">
+              جلسه قفل است
+            </span>
             <span className="text-[11px] text-muted max-w-[240px] leading-tight line-clamp-2">
               {lockMessage}
             </span>
@@ -170,7 +182,7 @@ export function BaseCard({
               variant={isCompleted ? "primary" : "secondary"}
               size="sm"
               isDisabled={!isCompleted || isLocked}
-              onClick={onNext}
+              onPress={onNext}
             >
               <span>{nextButtonText}</span>
               <AltArrowLeftIcon className="size-3.5 sm:size-4 ms-1 transition-transform group-hover:translate-x-0.5" />

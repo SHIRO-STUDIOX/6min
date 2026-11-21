@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import { Button, Card } from "@heroui/react";
+import { Button } from "@heroui/react";
+import { BaseCard } from "@/components/molecules/base-card";
 import { scopedApi } from "@/lib/client/api";
 import { errorMessage } from "@/lib/client/messages";
 import {
@@ -37,6 +38,9 @@ export type LessonVideoProps = {
   onCredit?: () => void;
   onInteract?: () => void;
   demoOnly?: boolean;
+  onNext?: () => void;
+  cardLabel?: string;
+  className?: string;
 };
 
 export function LessonVideo(props: LessonVideoProps) {
@@ -60,6 +64,9 @@ function LessonVideoRuntime({
   onInteract,
   demoOnly = true,
   subjectScope,
+  onNext,
+  cardLabel = "کارت ۱: ویدیوی آموزشی",
+  className,
 }: LessonVideoProps) {
   const api = scopedApi(subjectScope);
   const media = useRef<HTMLVideoElement | null>(null);
@@ -196,16 +203,58 @@ function LessonVideoRuntime({
   }, [durationMs, ready, persist, sync]);
 
   return (
-    <Card className="w-full max-w-xl p-4 gap-3">
-      <Card.Header>
-        <Card.Title>{demoOnly ? "ویدیوی آزمایشی" : "ویدیوی درس"}</Card.Title>
-        <Card.Description>
-          {demoOnly
-            ? "کلیپ تست بی‌صدا؛ محتوای نهایی دوره نیست."
-            : "پیشرفت مشاهده از پخش واقعی ثبت می‌شود."}
-        </Card.Description>
-      </Card.Header>
-      <Card.Content>
+    <BaseCard
+      cardLabel={cardLabel}
+      title="ویدیوی درس"
+      description={
+        demoOnly
+          ? "کلیپ تست بی‌صدا؛ محتوای نهایی دوره نیست."
+          : "پیشرفت مشاهده از پخش واقعی ثبت می‌شود."
+      }
+      progressPercentage={coverage * 100}
+      progressLabel="میزان مشاهده:"
+      progressBarAriaLabel="میزان پیشرفت مشاهده ویدیو"
+      isCompleted={credited}
+      completedStatusText="مشاهده تأیید شد"
+      onNext={onNext}
+      className={className}
+      scrollContent
+      footerStart={
+        <div className="flex min-w-0 flex-col items-start gap-1 text-[11px]">
+          <p role="status" data-testid="video-status">
+            {!persist
+              ? "پیش‌نمایش محلی؛ بدون ثبت امتیاز"
+              : credited
+                ? "مشاهده تأیید شد"
+                : ready
+                  ? "ثبت مشاهده فعال است"
+                  : "در حال اتصال…"}{" "}
+            — {Math.floor(coverage * 100)}٪
+          </p>
+          {error && (
+            <>
+              <p role="alert">
+                {errorMessage(error)} — پیشرفت جدید هنوز تأیید نشده است.
+              </p>
+              <Button
+                size="sm"
+                variant="ghost"
+                onPress={() => {
+                  if (session.current) void sync();
+                  else setAttempt((value) => value + 1);
+                }}
+              >
+                تلاش دوباره
+              </Button>
+            </>
+          )}
+        </div>
+      }
+    >
+      <div
+        data-player
+        className="relative w-full aspect-video rounded-2xl overflow-hidden border border-separator bg-black/90 shadow-md isolate"
+      >
         <ReactPlayer
           ref={media}
           src={src}
@@ -271,34 +320,7 @@ function LessonVideoRuntime({
             default
           />
         </ReactPlayer>
-      </Card.Content>
-      <Card.Footer className="flex flex-col items-start gap-2">
-        <p role="status" data-testid="video-status">
-          {!persist
-            ? "پیش‌نمایش محلی؛ بدون ثبت امتیاز"
-            : credited
-              ? "مشاهده تأیید شد"
-              : ready
-                ? "ثبت مشاهده فعال است"
-                : "در حال اتصال…"}{" "}
-          — {Math.floor(coverage * 100)}٪
-        </p>
-        {error && (
-          <>
-            <p role="alert">
-              {errorMessage(error)} — پیشرفت جدید هنوز تأیید نشده است.
-            </p>
-            <Button
-              onPress={() => {
-                if (session.current) void sync();
-                else setAttempt((value) => value + 1);
-              }}
-            >
-              تلاش دوباره
-            </Button>
-          </>
-        )}
-      </Card.Footer>
-    </Card>
+      </div>
+    </BaseCard>
   );
 }

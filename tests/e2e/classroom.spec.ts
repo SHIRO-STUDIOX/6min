@@ -4,7 +4,7 @@ import { randomInt } from "node:crypto";
 test("S8 header has exactly four More actions, modal disables dock and exiting class preserves login", async ({
   page,
 }) => {
-  const origin = "http://localhost:6106";
+  const origin = new URL(test.info().project.use.baseURL!).origin;
   const post = (path: string, data: unknown) =>
     page.request.post(`/api/v1${path}`, { headers: { Origin: origin }, data });
   const issued = (
@@ -100,6 +100,40 @@ test("S8 full UI learning uses real playback and deferred FSMs, restores grammar
       .getByRole("navigation", { name: "نشانگر مراحل کلاس درس" })
       .getByRole("button");
   await dots().nth(1).click();
+  // Public option order is arbitrary. A recorded target must not disable
+  // another target just because its prototype pair ID matches the source.
+  const lesson = (
+    await (await page.request.get("/api/v1/lessons/de-01")).json()
+  ).data;
+  const matching = lesson.stages.find(
+    (stage: { exerciseKind: string }) =>
+      stage.exerciseKind === "vocabulary-match",
+  );
+  const [first, second] = matching.questions;
+  const [firstOption, secondOption] = first.options;
+  await page.getByRole("button", { name: first.prompt, exact: true }).click();
+  await page
+    .getByRole("button", { name: secondOption.text, exact: true })
+    .click();
+  await expect(
+    page.getByRole("button", { name: secondOption.text, exact: true }),
+  ).toBeDisabled();
+  await expect(
+    page.getByRole("button", { name: firstOption.text, exact: true }),
+  ).toBeEnabled();
+  await page.getByRole("button", { name: second.prompt, exact: true }).click();
+  await page
+    .getByRole("button", { name: firstOption.text, exact: true })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "ثبت تلاش کامل", exact: true }),
+  ).toBeEnabled();
+  await expect(page.getByText("تلاش کامل ثبت شد", { exact: true })).toHaveCount(
+    0,
+  );
+  await page
+    .getByRole("button", { name: "تلاش تازه از ابتدا", exact: true })
+    .click();
   await page.getByRole("button", { name: "Hallo", exact: true }).click();
   await page.getByRole("button", { name: "سلام", exact: true }).click();
   await page.getByRole("button", { name: "Tschüss", exact: true }).click();

@@ -16,7 +16,9 @@ import { errorMessage } from "@/lib/client/messages";
 import type { Learner } from "@/lib/contracts/experience";
 import type { PublicStage } from "@/lib/contracts/content";
 import type { FullAttemptInput } from "@/lib/contracts/attempt";
-import { QuestionRenderer } from "@/components/molecules/question-renderer";
+import { BaseCard } from "@/components/molecules/base-card";
+import { VocabularyCardView } from "@/components/organisms/vocabulary-card";
+import { GrammarCardView } from "@/components/organisms/grammar-card";
 
 export type AttemptReceipt = {
   attemptId: string;
@@ -31,6 +33,9 @@ type Props = {
   stage: PublicStage;
   onResult?: (receipt: AttemptReceipt) => void;
   onInteract?: () => void;
+  onNext?: () => void;
+  cardLabel?: string;
+  draftStatus?: string;
 };
 const matchingDraft = z.object({
   selections: z.array(z.object({ sourceId: z.string(), targetId: z.string() })),
@@ -48,35 +53,48 @@ export function LessonExercise(props: Props) {
     props.revisionId,
     props.stage.id,
   );
-  if (!draft.loaded) return <p role="status">در حال بازیابی پیش‌نویس…</p>;
+  const frame = {
+    cardLabel: props.cardLabel,
+    title:
+      props.stage.exerciseKind === "vocabulary-match"
+        ? "واژگان تخصصی"
+        : "پازل کلمات و گرامر",
+    className: "h-full",
+    scrollContent: true,
+  };
+  if (!draft.loaded)
+    return (
+      <BaseCard {...frame}>
+        <p role="status">در حال بازیابی پیش‌نویس…</p>
+      </BaseCard>
+    );
   if (draft.conflict)
     return (
-      <div className="flex flex-col gap-3">
+      <BaseCard {...frame}>
         <p>دو نسخه متفاوت از پیش‌نویس موجود است. کدام نسخه را ادامه می‌دهید؟</p>
         <Button onPress={() => draft.resolve("local")}>
           ادامه نسخه این دستگاه
         </Button>
         <Button onPress={() => draft.resolve("server")}>ادامه نسخه حساب</Button>
-      </div>
+      </BaseCard>
     );
+  const runtimeProps = {
+    ...props,
+    initial: draft.initial,
+    save: draft.save,
+    draftStatus: draft.status,
+  };
+  if (props.stage.exerciseKind === "vocabulary-match")
+    return <Matching {...runtimeProps} />;
+  if (props.stage.exerciseKind === "grammar-order")
+    return <Grammar {...runtimeProps} />;
   return (
-    <div className="flex flex-col gap-3">
-      {props.stage.exerciseKind === "vocabulary-match" ? (
-        <Matching {...props} initial={draft.initial} save={draft.save} />
-      ) : props.stage.exerciseKind === "grammar-order" ? (
-        <Grammar {...props} initial={draft.initial} save={draft.save} />
-      ) : (
-        <p>
-          محتوای معتبر این تمرین هنوز آماده نیست؛ امتیاز شبیه‌سازی‌شده ثبت
-          نمی‌شود.
-        </p>
-      )}
-      {draft.status && (
-        <p role="status" className="text-xs text-muted">
-          {draft.status}
-        </p>
-      )}
-    </div>
+    <BaseCard {...frame}>
+      <p>
+        محتوای معتبر این تمرین هنوز آماده نیست؛ امتیاز شبیه‌سازی‌شده ثبت
+        نمی‌شود.
+      </p>
+    </BaseCard>
   );
 }
 
@@ -86,12 +104,14 @@ function Submission({
   reset,
   preview,
   subjectScope,
+  onNext,
 }: {
   body: FullAttemptInput | null;
   onResult?: Props["onResult"];
   reset: () => void;
   preview: boolean;
   subjectScope?: string;
+  onNext?: () => void;
 }) {
   const api = scopedApi(subjectScope);
   const key = useRef<string | null>(null);
@@ -99,7 +119,7 @@ function Submission({
   const [error, setError] = useState("");
   const [receipt, setReceipt] = useState<AttemptReceipt | null>(null);
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 text-xs">
       {receipt && (
         <p role="status">
           نتیجه ثبت شد: {Math.round(receipt.exerciseScore * 100)}٪ پاسخ درست؛
@@ -136,8 +156,14 @@ function Submission({
           ثبت تلاش کامل
         </Button>
       )}
+      {receipt && onNext && (
+        <Button size="sm" onPress={onNext}>
+          کارت بعدی
+        </Button>
+      )}
       <Button
-        variant="secondary"
+        size="sm"
+        variant="ghost"
         isDisabled={busy}
         onPress={() => {
           key.current = null;
@@ -162,6 +188,9 @@ function Matching({
   save,
   onResult,
   onInteract,
+  onNext,
+  cardLabel,
+  draftStatus,
 }: Props & { initial: unknown; save: (input: unknown) => void }) {
   const signature = JSON.stringify(stage.questions);
   const pairs = useMemo(() => vocabularyPairs(stage), [stage.id, signature]);
@@ -172,10 +201,8 @@ function Matching({
     successFeedbackMs: 120,
   });
   const [hydrated, setHydrated] = useState(false);
-  const restored = useRef<unknown>(Symbol("not-restored"));
   useEffect(() => {
-    if (restored.current === initial) return;
-    restored.current = initial;
+    // Restoration is idempotent: repeat it after StrictMode replays the FSM reset.
     const parsed = matchingDraft.safeParse(initial);
     if (parsed.success) fsm.restoreDeferred(parsed.data.selections);
     setHydrated(true);
@@ -185,75 +212,59 @@ function Matching({
     if (hydrated && fsm.deferredAnswers.length)
       save({ selections: fsm.deferredAnswers });
   }, [selections, hydrated, save]);
-  const question = stage.questions.find(
-    (question) => question.id === fsm.selectedSourceId,
-  );
+  const [assessed, setAssessed] = useState(false);
   const complete = fsm.deferredAnswers.length === pairs.length;
   return (
-    <div className="flex flex-col gap-3">
-      <p>
-        هر واژه را انتخاب کنید، سپس معادل آن را بزنید. درستی پاسخ‌ها پس از ثبت
-        تلاش بررسی می‌شود.
-      </p>
-      <div className="flex flex-wrap gap-2" dir="ltr">
-        {fsm.sourceItems.map((item) => (
-          <Button
-            key={item.id}
-            isDisabled={fsm.matchedIds.has(item.pairId) || fsm.isLocked}
-            variant={fsm.selectedSourceId === item.id ? "primary" : "secondary"}
-            onPress={() => {
-              onInteract?.();
-              fsm.selectItem("source", item.id);
-            }}
-          >
-            {item.text}
-          </Button>
-        ))}
-      </div>
-      {question && (
-        <QuestionRenderer
-          question={{
-            ...question,
-            options: question.options.filter(
-              (option) =>
-                !fsm.deferredAnswers.some(
-                  (answer) => answer.targetId === option.id,
-                ),
-            ),
+    <VocabularyCardView
+      fsm={fsm}
+      pairs={pairs}
+      deferred
+      assessed={assessed}
+      cardLabel={cardLabel}
+      title="واژگان تخصصی"
+      description="جفت‌های واژگان درس و معادل فارسی را به هم وصل کنید"
+      className="h-full"
+      onInteract={onInteract}
+      status={
+        <>
+          <p className="text-xs text-muted">
+            {fsm.deferredAnswers.length} از {pairs.length} پاسخ ثبت موقت شد؛
+            درستی پاسخ‌ها پس از ثبت تلاش بررسی می‌شود.
+          </p>
+          {draftStatus && (
+            <p role="status" className="text-xs text-muted">
+              {draftStatus}
+            </p>
+          )}
+        </>
+      }
+      actions={
+        <Submission
+          subjectScope={model?.scope}
+          preview={!model}
+          body={
+            complete
+              ? vocabularyCompletion(
+                  lessonId,
+                  revisionId,
+                  stage,
+                  fsm.deferredAnswers,
+                )
+              : null
+          }
+          onResult={(receipt) => {
+            setAssessed(true);
+            onResult?.(receipt);
           }}
-          kind="vocabulary-match"
-          response={null}
-          disabled={fsm.isLocked}
-          onResponse={(response) => {
-            if ("choiceId" in response)
-              fsm.selectItem("target", response.choiceId);
+          onNext={onNext}
+          reset={() => {
+            setAssessed(false);
+            fsm.reset();
+            save({ selections: [] });
           }}
         />
-      )}
-      <p>
-        {fsm.deferredAnswers.length} از {pairs.length} پاسخ ثبت موقت شد؛ هنوز
-        نمره‌دهی نشده است.
-      </p>
-      <Submission
-        subjectScope={model?.scope}
-        preview={!model}
-        body={
-          complete
-            ? vocabularyCompletion(
-                lessonId,
-                revisionId,
-                stage,
-                fsm.deferredAnswers,
-              )
-            : null
-        }
-        onResult={onResult}
-        reset={() => {
-          fsm.reset();
-          save({ selections: [] });
-        }}
-      />
-    </div>
+      }
+    />
   );
 }
 
@@ -266,6 +277,9 @@ function Grammar({
   save,
   onResult,
   onInteract,
+  onNext,
+  cardLabel,
+  draftStatus,
 }: Props & { initial: unknown; save: (input: unknown) => void }) {
   const signature = JSON.stringify(stage.questions);
   const sentences = useMemo(
@@ -273,6 +287,7 @@ function Grammar({
       stage.questions.map((question) => ({
         id: question.id,
         targetSentence: "",
+        translation: question.prompt,
         tokens: question.options.map((option) => option.text),
         publicTokens: question.options,
       })),
@@ -285,10 +300,8 @@ function Grammar({
     successFeedbackMs: 120,
   });
   const [hydrated, setHydrated] = useState(false);
-  const restored = useRef<unknown>(Symbol("not-restored"));
   useEffect(() => {
-    if (restored.current === initial) return;
-    restored.current = initial;
+    // Restoration is idempotent: repeat it after StrictMode replays the FSM reset.
     const parsed = grammarDraft.safeParse(initial);
     if (parsed.success) fsm.restoreDeferred(parsed.data);
     setHydrated(true);
@@ -311,73 +324,59 @@ function Grammar({
       (fsm.deferredAnswers[question.id]?.length ?? 0) ===
       question.options.length,
   );
-  const question = stage.questions[fsm.currentSentenceIndex];
+  const [assessed, setAssessed] = useState(false);
   return (
-    <div className="flex flex-col gap-3">
-      <p>
-        جمله {fsm.currentSentenceIndex + 1} از {sentences.length}؛ پاسخ‌ها پس از
-        تلاش کامل بررسی می‌شوند.
-      </p>
-      {!complete && (
-        <QuestionRenderer
-          question={question}
-          kind="grammar-order"
-          response={{ tokenIds: snapshot.selectedTokenIds }}
-          disabled={fsm.isLocked}
-          onResponse={(response) => {
-            if (!("tokenIds" in response)) return;
-            onInteract?.();
-            if (response.tokenIds.length > fsm.selectedTokens.length) {
-              const id = response.tokenIds.find(
-                (id) => !fsm.selectedTokens.some((token) => token.id === id),
-              );
-              const token = fsm.allBankTokens.find((token) => token.id === id);
-              if (token) fsm.selectBankToken(token);
-            } else {
-              const token = fsm.selectedTokens.find(
-                (token) => !response.tokenIds.includes(token.id),
-              );
-              if (token) fsm.deselectSentenceToken(token);
-            }
+    <GrammarCardView
+      fsm={fsm}
+      sentences={sentences}
+      deferred
+      assessed={assessed}
+      cardLabel={cardLabel}
+      className="h-full"
+      description="کلمات را برای ساخت جملهٔ صحیح به ترتیب لمس کنید"
+      onInteract={onInteract}
+      status={
+        <>
+          <p className="text-xs text-muted">
+            پاسخ‌ها پس از ثبت تلاش کامل بررسی می‌شوند.
+          </p>
+          {draftStatus && (
+            <p role="status" className="text-xs text-muted">
+              {draftStatus}
+            </p>
+          )}
+        </>
+      }
+      actions={
+        <Submission
+          subjectScope={model?.scope}
+          preview={!model}
+          body={
+            complete
+              ? fullCompletion(
+                  lessonId,
+                  revisionId,
+                  stage,
+                  Object.fromEntries(
+                    Object.entries(fsm.deferredAnswers).map(
+                      ([id, tokenIds]) => [id, { tokenIds }],
+                    ),
+                  ),
+                )
+              : null
+          }
+          onResult={(receipt) => {
+            setAssessed(true);
+            onResult?.(receipt);
+          }}
+          onNext={onNext}
+          reset={() => {
+            setAssessed(false);
+            fsm.resetAll();
+            save({ answers: {}, currentIndex: 0, selectedTokenIds: [] });
           }}
         />
-      )}
-      {!complete && (
-        <Button
-          variant="secondary"
-          isDisabled={
-            fsm.isLocked ||
-            fsm.selectedTokens.length !== question.options.length
-          }
-          onPress={fsm.checkSentence}
-        >
-          ثبت موقت این پاسخ
-        </Button>
-      )}
-      <Submission
-        subjectScope={model?.scope}
-        preview={!model}
-        body={
-          complete
-            ? fullCompletion(
-                lessonId,
-                revisionId,
-                stage,
-                Object.fromEntries(
-                  Object.entries(fsm.deferredAnswers).map(([id, tokenIds]) => [
-                    id,
-                    { tokenIds },
-                  ]),
-                ),
-              )
-            : null
-        }
-        onResult={onResult}
-        reset={() => {
-          fsm.resetAll();
-          save({ answers: {}, currentIndex: 0, selectedTokenIds: [] });
-        }}
-      />
-    </div>
+      }
+    />
   );
 }

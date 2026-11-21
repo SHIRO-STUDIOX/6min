@@ -10,6 +10,7 @@ import {
 import { useRouter } from "next/navigation";
 import { Button, Card } from "@heroui/react";
 import { AppFrame } from "./app-frame";
+import { BaseCard } from "@/components/molecules/base-card";
 import { StageIndicator } from "@/components/molecules/StageIndicator";
 import { LessonVideo } from "@/components/organisms/lesson-video";
 import {
@@ -216,13 +217,16 @@ export function Classroom({
               style={
                 {
                   "--card-width": "min(500px, calc(100vw - 40px))",
-                  maxWidth: "min(656px, calc(100vw - 24px))",
+                  "--stage-width": "min(812px, calc(100vw - 24px))",
+                  "--stage-pad":
+                    "calc((var(--stage-width) - var(--card-width)) / 2)",
+                  maxWidth: "var(--stage-width)",
                 } as CSSProperties
               }
             >
               <div
                 className="flex justify-center mb-3"
-                style={{ width: "var(--card-width)" }}
+                style={{ width: "var(--stage-width)" }}
               >
                 <StageIndicator
                   totalSteps={lesson.stages.length}
@@ -232,7 +236,7 @@ export function Classroom({
                 />
               </div>
               <div
-                className="relative overflow-hidden"
+                className="relative overflow-hidden rounded-3xl"
                 data-testid="action-center"
                 style={{ touchAction: "pan-y" }}
                 onPointerDown={(event) => {
@@ -278,100 +282,120 @@ export function Classroom({
                   dir="ltr"
                   className={`flex gap-[6px] items-stretch ${drag ? "" : "motion-safe:transition-transform motion-safe:duration-200"}`}
                   style={{
+                    paddingInline: "var(--stage-pad)",
                     transform: `translateX(calc(-${index} * (var(--card-width) + 6px) + ${drag}px))`,
                   }}
                 >
-                  {lesson.stages.map((item, position) => (
-                    <Card
-                      key={item.id}
-                      dir="rtl"
-                      inert={position !== index ? true : undefined}
-                      aria-hidden={position !== index || undefined}
-                      data-testid={`stage-shell-${position}`}
-                      className="shrink-0 bg-surface border border-separator rounded-3xl p-4 flex flex-col gap-3"
-                      style={{
-                        width: "var(--card-width)",
-                        height: "max(500px, min(560px, 75dvh))",
-                        pointerEvents: position === index ? "auto" : "none",
-                      }}
-                    >
-                      <Card.Header>
-                        <Card.Title>
-                          {item.kind === "video"
-                            ? "ویدیوی درس"
-                            : item.exerciseKind === "vocabulary-match"
-                              ? "واژگان"
-                              : "ساخت جمله"}
-                        </Card.Title>
-                        <Card.Description>
-                          مرحله {position + 1} از {lesson.stages.length}
-                        </Card.Description>
-                      </Card.Header>
-                      <Card.Content
-                        className="min-h-0 overflow-y-auto flex-1"
-                        data-app-scroll
+                  {lesson.stages.map((item, position) => {
+                    const title =
+                      item.kind === "video"
+                        ? "ویدیوی درس"
+                        : item.exerciseKind === "vocabulary-match"
+                          ? "واژگان تخصصی"
+                          : "پازل کلمات و گرامر";
+                    const cardLabel = `کارت ${position + 1}: ${item.kind === "video" ? "ویدیوی آموزشی" : item.exerciseKind === "vocabulary-match" ? "تطبیق واژگان" : "ساختار جمله و گرامر"}`;
+                    const next =
+                      position < lesson.stages.length - 1
+                        ? () => select(position + 1)
+                        : undefined;
+                    return (
+                      <div
+                        key={item.id}
+                        dir="rtl"
+                        inert={position !== index ? true : undefined}
+                        aria-hidden={position !== index || undefined}
+                        data-testid={`stage-shell-${position}`}
+                        className="shrink-0"
+                        style={{
+                          width: "var(--card-width)",
+                          height: "var(--card-width)",
+                          pointerEvents: position === index ? "auto" : "none",
+                        }}
                       >
-                        {position === index &&
-                          (item.activityLocked ? (
-                            <div
-                              role="status"
-                              className="h-full flex flex-col items-center justify-center gap-3 bg-surface/80 backdrop-blur-md"
-                            >
-                              <p>
-                                فعالیت این مرحله قفل است. ابتدا پیش‌نیاز قبلی را
-                                کامل کنید.
-                              </p>
-                              <Button
-                                variant="secondary"
-                                onPress={() =>
-                                  select(Math.max(0, position - 1))
-                                }
-                              >
-                                رفتن به پیش‌نیاز
-                              </Button>
-                            </div>
-                          ) : item.kind === "video" ? (
-                            <div data-player>
-                              <LessonVideo
-                                key={`${model?.scope}:${item.id}`}
-                                lessonId={lesson.id}
-                                revisionId={lesson.currentRevisionId}
-                                assetId={lesson.video.assetId}
-                                src={lesson.video.url}
-                                captionsUrl={lesson.video.captionsUrl}
-                                durationMs={lesson.video.durationMs}
-                                demoOnly={lesson.demoOnly}
-                                persist
-                                subjectScope={model?.scope}
-                                onInteract={() => context("interaction")}
-                                onCredit={() => void load()}
-                              />
-                            </div>
-                          ) : (
-                            <LessonExercise
-                              key={`${model?.scope}:${item.id}`}
-                              model={model}
-                              lessonId={lesson.id}
-                              revisionId={lesson.currentRevisionId}
-                              stage={item}
-                              onResult={result}
-                              onInteract={() => context("interaction")}
-                            />
-                          ))}
-                      </Card.Content>
-                    </Card>
-                  ))}
+                        {position !== index || item.activityLocked ? (
+                          <BaseCard
+                            cardLabel={cardLabel}
+                            title={title}
+                            className="h-full"
+                            scrollContent
+                            isLocked={item.activityLocked}
+                            lockMessage={
+                              position === index
+                                ? "فعالیت این مرحله قفل است. ابتدا پیش‌نیاز قبلی را کامل کنید."
+                                : "برای شروع این بخش، پیش‌نیازها را کامل کنید."
+                            }
+                            footerEnd={
+                              item.activityLocked ? (
+                                <Button
+                                  size="sm"
+                                  variant="secondary"
+                                  onPress={() =>
+                                    select(Math.max(0, position - 1))
+                                  }
+                                >
+                                  رفتن به پیش‌نیاز
+                                </Button>
+                              ) : undefined
+                            }
+                          >
+                            <p className="text-xs text-muted">
+                              {item.activityLocked
+                                ? "برای شروع این فعالیت، پیش‌نیاز قبلی را کامل کنید."
+                                : "برای ادامه، این کارت را انتخاب کنید."}
+                            </p>
+                          </BaseCard>
+                        ) : item.kind === "video" ? (
+                          <LessonVideo
+                            key={`${model?.scope}:${item.id}`}
+                            lessonId={lesson.id}
+                            revisionId={lesson.currentRevisionId}
+                            assetId={lesson.video.assetId}
+                            src={lesson.video.url}
+                            captionsUrl={lesson.video.captionsUrl}
+                            durationMs={lesson.video.durationMs}
+                            demoOnly={lesson.demoOnly}
+                            persist
+                            subjectScope={model?.scope}
+                            onInteract={() => context("interaction")}
+                            onCredit={() => void load()}
+                            onNext={next}
+                            cardLabel={cardLabel}
+                            className="h-full"
+                          />
+                        ) : (
+                          <LessonExercise
+                            key={`${model?.scope}:${item.id}`}
+                            model={model}
+                            lessonId={lesson.id}
+                            revisionId={lesson.currentRevisionId}
+                            stage={item}
+                            onResult={result}
+                            onInteract={() => context("interaction")}
+                            onNext={next}
+                            cardLabel={cardLabel}
+                          />
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
                 <div
                   aria-hidden="true"
-                  className="absolute top-0 bottom-0 right-0 w-12 pointer-events-none"
-                  style={{
-                    backdropFilter: "blur(6px)",
-                    maskImage: "linear-gradient(to right, transparent, black)",
-                    background:
-                      "linear-gradient(to right, transparent, var(--background))",
-                  }}
-                />
+                  className="absolute top-0 bottom-0 right-0 w-24 sm:w-32 md:w-40 pointer-events-none z-30 select-none overflow-hidden"
+                >
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      backdropFilter: "blur(16px)",
+                      WebkitBackdropFilter: "blur(16px)",
+                      maskImage:
+                        "linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.25) 30%, rgba(0, 0, 0, 0.7) 65%, black 100%)",
+                      WebkitMaskImage:
+                        "linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.25) 30%, rgba(0, 0, 0, 0.7) 65%, black 100%)",
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-background/25 to-background/90" />
+                </div>
               </div>
               <div className="hidden md:flex justify-end gap-2 mt-4" dir="ltr">
                 {index > 0 && (

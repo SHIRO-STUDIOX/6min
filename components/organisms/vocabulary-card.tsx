@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, type ReactNode } from "react";
 import { Button, Chip } from "@heroui/react";
 import { RotateCcw as RestartIcon } from "lucide-react";
 import { CircleCheck as CheckCircleIcon } from "lucide-react";
@@ -97,19 +97,42 @@ export const DEFAULT_VOCABULARY_PAIRS: VocabularyPair[] = [
  * VocabularyCard — کارت تعاملی تطبیق واژگان بر پایه ماشین وضعیت متناهی (FSM)
  * تزریق‌شده در ساختار پایه BaseCard بدون بازنویسی ابعاد یا استایل‌های کانتینر.
  */
-export function VocabularyCard({
+export function VocabularyCard(props: VocabularyCardProps) {
+  const fsm = useVocabularyFsm({
+    pairs: props.pairs ?? DEFAULT_VOCABULARY_PAIRS,
+    autoShuffleTarget: props.autoShuffleTarget ?? true,
+    onAudioPlay: props.onAudioPlay,
+    onComplete: props.onComplete,
+  });
+  return <VocabularyCardView {...props} fsm={fsm} />;
+}
+
+/** The dev card presentation can also consume the live deferred FSM. */
+export function VocabularyCardView({
   cardLabel = "کارت ۲: تطبیق واژگان",
   title = "واژه‌نامه تخصصی درس",
   description = "کلمات انگلیسی را به معادل فارسی صحیح متصل کنید",
   pairs = DEFAULT_VOCABULARY_PAIRS,
-  autoShuffleTarget = true,
   isLocked: externalIsLocked = false,
   lockMessage,
   onNext,
-  onComplete,
-  onAudioPlay,
   className = "",
-}: VocabularyCardProps) {
+  fsm,
+  deferred = false,
+  assessed = false,
+  actions,
+  status,
+  onInteract,
+  onReset,
+}: VocabularyCardProps & {
+  fsm: ReturnType<typeof useVocabularyFsm>;
+  deferred?: boolean;
+  assessed?: boolean;
+  actions?: ReactNode;
+  status?: ReactNode;
+  onInteract?: () => void;
+  onReset?: () => void;
+}) {
   // ۱. اتصال به ماشین وضعیت متناهی (FSM)
   const {
     cardState,
@@ -121,16 +144,12 @@ export function VocabularyCard({
     isLocked: fsmLocked,
     mistakeCount,
     progressPercentage,
-    isCompleted,
+    isCompleted: locallyCompleted,
     selectItem,
     reset,
     playAudio,
-  } = useVocabularyFsm({
-    pairs,
-    autoShuffleTarget,
-    onAudioPlay,
-    onComplete,
-  });
+  } = fsm;
+  const isCompleted = deferred ? assessed : locallyCompleted;
 
   // قفل کلیک ترکیبی از وضعیت والد و وضعیت داخلی ارزیابی FSM
   const effectiveLocked = externalIsLocked || fsmLocked;
@@ -138,7 +157,24 @@ export function VocabularyCard({
   // استایل‌های وضعیت هر آیتم در ستون مبدأ یا مقصد
   const getItemVisualState = useMemo(() => {
     return (column: "source" | "target", item: VocabularyColumnItem) => {
-      const isMatched = matchedIds.has(item.pairId);
+      // Public option order is not an answer key. Mark the actual selected IDs.
+      if (
+        deferred &&
+        fsm.deferredAnswers.some((answer) =>
+          column === "source"
+            ? answer.sourceId === item.id
+            : answer.targetId === item.id,
+        )
+      ) {
+        return {
+          containerClass:
+            "bg-accent/10 text-accent border-accent/30 opacity-75",
+          badgeClass: "bg-accent/20 text-accent",
+          isDone: true,
+          status: "recorded" as const,
+        };
+      }
+      const isMatched = !deferred && matchedIds.has(item.pairId);
       const isSelected =
         column === "source"
           ? selectedSourceId === item.id
@@ -197,10 +233,21 @@ export function VocabularyCard({
         status: "idle" as const,
       };
     };
-  }, [matchedIds, selectedSourceId, selectedTargetId, cardState]);
+  }, [
+    matchedIds,
+    selectedSourceId,
+    selectedTargetId,
+    cardState,
+    deferred,
+    fsm.deferredAnswers,
+  ]);
 
   // متن و وضعیت پیشرفت
-  const progressLabel = isCompleted ? "تکمیل تمام جفت‌ها:" : "جفت‌های متصل شده:";
+  const progressLabel = deferred
+    ? "پاسخ‌های ثبت موقت:"
+    : isCompleted
+      ? "تکمیل تمام جفت‌ها:"
+      : "جفت‌های متصل شده:";
   const progressText = `${matchedIds.size} از ${pairs.length}`;
 
   return (
@@ -212,51 +259,57 @@ export function VocabularyCard({
       progressLabel={progressLabel}
       progressText={progressText}
       isCompleted={isCompleted}
-      completedStatusText="واژگان با موفقیت تطبیق یافتند"
+      completedStatusText={
+        deferred ? "تلاش کامل ثبت شد" : "واژگان با موفقیت تطبیق یافتند"
+      }
       isLocked={externalIsLocked}
       lockMessage={lockMessage}
       progressBarAriaLabel="میزان پیشرفت تطبیق واژگان"
       nextButtonText="کارت بعدی"
       onNext={onNext}
       className={className}
+      scrollContent={deferred}
+      footerEnd={actions}
       footerStart={
-        <div className="flex items-center gap-2">
-          {/* دکمه شروع مجدد / ریست */}
-          <Button
-            variant="ghost"
-            size="sm"
-            isIconOnly
-            onClick={reset}
-            aria-label="شروع مجدد تمرین واژگان"
-            isDisabled={effectiveLocked}
-            className="text-muted hover:text-foreground"
-          >
-            <RestartIcon className="size-4" />
-          </Button>
-
-          {/* شمارنده خطاهای کاربر */}
-          {mistakeCount > 0 && (
-            <Chip
+        !deferred && (
+          <div className="flex items-center gap-2">
+            {/* دکمه شروع مجدد / ریست */}
+            <Button
+              variant="ghost"
               size="sm"
-              variant="soft"
-              color="danger"
-              className="font-tabular text-[11px] font-medium h-6 px-2 border border-danger/20"
+              isIconOnly
+              onPress={onReset ?? reset}
+              aria-label="شروع مجدد تمرین واژگان"
+              isDisabled={effectiveLocked}
+              className="text-muted hover:text-foreground"
             >
-              <Chip.Label className="flex items-center gap-1">
-                <AlertCircle className="size-3 text-danger" />
-                <span>{mistakeCount} خطا</span>
-              </Chip.Label>
-            </Chip>
-          )}
+              <RestartIcon className="size-4" />
+            </Button>
 
-          {/* نشانگر اتمام کامل */}
-          {isCompleted && (
-            <div className="flex items-center gap-1 text-[11px] font-bold text-success bg-success/10 px-2.5 py-1 rounded-lg border border-success/20">
-              <StarsIcon className="size-3.5" />
-              <span className="hidden sm:inline">آفرین! تکمیل شد</span>
-            </div>
-          )}
-        </div>
+            {/* شمارنده خطاهای کاربر */}
+            {mistakeCount > 0 && (
+              <Chip
+                size="sm"
+                variant="soft"
+                color="danger"
+                className="font-tabular text-[11px] font-medium h-6 px-2 border border-danger/20"
+              >
+                <Chip.Label className="flex items-center gap-1">
+                  <AlertCircle className="size-3 text-danger" />
+                  <span>{mistakeCount} خطا</span>
+                </Chip.Label>
+              </Chip>
+            )}
+
+            {/* نشانگر اتمام کامل */}
+            {isCompleted && (
+              <div className="flex items-center gap-1 text-[11px] font-bold text-success bg-success/10 px-2.5 py-1 rounded-lg border border-success/20">
+                <StarsIcon className="size-3.5" />
+                <span className="hidden sm:inline">آفرین! تکمیل شد</span>
+              </div>
+            )}
+          </div>
+        )
       }
     >
       {/* ======================================================== */}
@@ -266,7 +319,7 @@ export function VocabularyCard({
         {/* هدر ستون‌ها */}
         <div className="grid grid-cols-2 gap-3 text-[11px] font-semibold text-default-400 px-1">
           <div className="text-start flex items-center justify-between">
-            <span>واژگان انگلیسی</span>
+            <span>{deferred ? "واژگان درس" : "واژگان انگلیسی"}</span>
             <span className="text-[10px] opacity-60">Source</span>
           </div>
           <div className="text-start flex items-center justify-between">
@@ -288,7 +341,10 @@ export function VocabularyCard({
                   key={item.id}
                   type="button"
                   disabled={isItemLocked}
-                  onClick={() => selectItem("source", item.id)}
+                  onClick={() => {
+                    onInteract?.();
+                    selectItem("source", item.id);
+                  }}
                   aria-pressed={selectedSourceId === item.id}
                   className={`group relative w-full h-[54px] px-3 py-1.5 rounded-2xl border transition-all duration-200 flex items-center justify-between text-start outline-none focus-visible:ring-2 focus-visible:ring-primary ${visual.containerClass}`}
                 >
@@ -350,7 +406,10 @@ export function VocabularyCard({
                   key={item.id}
                   type="button"
                   disabled={isItemLocked}
-                  onClick={() => selectItem("target", item.id)}
+                  onClick={() => {
+                    onInteract?.();
+                    selectItem("target", item.id);
+                  }}
                   aria-pressed={selectedTargetId === item.id}
                   className={`group relative w-full h-[54px] px-3 py-1.5 rounded-2xl border transition-all duration-200 flex items-center justify-between text-start outline-none focus-visible:ring-2 focus-visible:ring-primary ${visual.containerClass}`}
                 >
@@ -376,6 +435,7 @@ export function VocabularyCard({
             })}
           </div>
         </div>
+        {status}
       </div>
     </BaseCard>
   );
